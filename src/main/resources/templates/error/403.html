@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>403 - 접근 권한이 없습니다</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .error-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 3rem;
+            text-align: center;
+            max-width: 500px;
+        }
+
+        .error-code {
+            font-size: 6rem;
+            font-weight: 800;
+            color: #f5576c;
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            color: #7f8c8d;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .btn-home {
+            display: inline-block;
+            padding: 0.875rem 2rem;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .btn-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+        }
+
+        .illustration {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="illustration">🔒</div>
+        <div class="error-code">403</div>
+        <h1>접근 권한이 없습니다</h1>
+        <p>이 페이지에 접근할 권한이 없습니다.<br>
+        로그인이 필요하거나 권한이 부족합니다.</p>
+        <a href="/" class="btn-home">홈으로 돌아가기</a>
+    </div>
+</body>
+</html>

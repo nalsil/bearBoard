@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" th:content="${company != null ? company.description : '회사 소개'}">
+    <title th:text="${company != null ? company.name + ' - 회사 소개' : '회사 소개'}">회사 소개</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/public.css}">
+    <script th:if="${company != null and company.latitude != null and company.longitude != null}"
+            type="text/javascript" th:src="@{'//dapi.kakao.com/v2/maps/sdk.js?appkey=' + ${@environment.getProperty('app.kakao.map.app-key')}}"></script>
+</head>
+<body>
+    <!-- 헤더 -->
+    <div th:replace="~{layout/layout :: header}"></div>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+        <div class="container">
+            <article class="about-page" th:if="${company != null}">
+                <header class="page-header">
+                    <h1>회사 소개</h1>
+                </header>
+
+                <!-- 기업 정보 -->
+                <section class="company-overview">
+                    <h2 th:text="${company.name}">회사명</h2>
+                    <p class="company-description" th:text="${company.description}">회사 설명</p>
+
+                    <div class="company-details">
+                        <div class="detail-item" th:if="${company.foundedDate}">
+                            <strong>설립일</strong>
+                            <span th:text="${#temporals.format(company.foundedDate, 'yyyy년 MM월 dd일')}">설립일</span>
+                        </div>
+                        <div class="detail-item" th:if="${company.address}">
+                            <strong>주소</strong>
+                            <span th:text="${company.address}">주소</span>
+                        </div>
+                        <div class="detail-item" th:if="${company.phone}">
+                            <strong>전화</strong>
+                            <span th:text="${company.phone}">전화번호</span>
+                        </div>
+                        <div class="detail-item" th:if="${company.email}">
+                            <strong>이메일</strong>
+                            <span><a th:href="'mailto:' + ${company.email}" th:text="${company.email}">이메일</a></span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 지도 섹션 -->
+                <section class="map-section" th:if="${company.latitude != null and company.longitude != null}">
+                    <h2>찾아오시는 길</h2>
+                    <div id="kakao-map" style="width:100%;height:400px;"></div>
+                    <p class="map-address" th:text="${company.address}">주소</p>
+                </section>
+            </article>
+
+            <!-- 기업 정보 없음 -->
+            <div class="error-message" th:unless="${company != null}">
+                <p>회사 정보를 찾을 수 없습니다.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- 푸터 -->
+    <div th:replace="~{layout/layout :: footer}"></div>
+
+    <script th:src="@{/js/common.js}"></script>
+
+    <!-- Kakao Map 초기화 스크립트 -->
+    <script th:if="${company != null and company.latitude != null and company.longitude != null}" th:inline="javascript">
+        /*<![CDATA[*/
+        document.addEventListener('DOMContentLoaded', function() {
+            var latitude = /*[[${company.latitude}]]*/ 37.5;
+            var longitude = /*[[${company.longitude}]]*/ 127.0;
+            var companyName = /*[[${company.name}]]*/ '회사명';
+
+            var mapContainer = document.getElementById('kakao-map');
+            var mapOption = {
+                center: new kakao.maps.LatLng(latitude, longitude),
+                level: 3
+            };
+
+            var map = new kakao.maps.Map(mapContainer, mapOption);
+
+            var markerPosition = new kakao.maps.LatLng(latitude, longitude);
+            var marker = new kakao.maps.Marker({
+                position: markerPosition,
+                title: companyName
+            });
+
+            marker.setMap(map);
+        });
+        /*]]>*/
+    </script>
+</body>
+</html>

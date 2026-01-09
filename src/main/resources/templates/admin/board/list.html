@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 관리</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="admin-header">
+        <div class="admin-header-content">
+            <h1>게시글 관리</h1>
+            <div class="admin-user-info">
+                <span th:text="${board != null ? board.name : '게시판'}">게시판명</span>
+                <a th:href="@{/admin/logout}" class="btn-logout">로그아웃</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 사이드바 -->
+    <aside class="admin-sidebar">
+        <nav class="admin-nav">
+            <a th:href="@{/admin/dashboard}" class="nav-item">대시보드</a>
+            <a th:href="@{/admin/boards/1/posts}" class="nav-item active">게시판 관리</a>
+            <a th:href="@{/admin/faqs}" class="nav-item">FAQ 관리</a>
+            <a th:href="@{/admin/qnas}" class="nav-item">QnA 관리</a>
+            <a th:href="@{/admin/youtube}" class="nav-item">영상 관리</a>
+            <a th:href="@{/admin/products}" class="nav-item">상품 관리</a>
+        </nav>
+    </aside>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="admin-main">
+        <div class="page-header">
+            <h1 th:text="${board != null ? board.name : '게시글 목록'}">게시글 목록</h1>
+            <a th:href="@{/admin/boards/{boardId}/posts/new(boardId=${board.id})}" class="btn-primary">게시글 작성</a>
+        </div>
+
+        <!-- 성공 메시지 -->
+        <div class="alert alert-success" th:if="${param.success}">
+            <span th:if="${param.success[0] == 'created'}">게시글이 등록되었습니다.</span>
+            <span th:if="${param.success[0] == 'updated'}">게시글이 수정되었습니다.</span>
+            <span th:if="${param.success[0] == 'deleted'}">게시글이 삭제되었습니다.</span>
+        </div>
+
+        <div class="data-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">ID</th>
+                        <th>제목</th>
+                        <th style="width: 100px;">작성자</th>
+                        <th style="width: 80px;">조회수</th>
+                        <th style="width: 80px;">상태</th>
+                        <th style="width: 140px;">작성일</th>
+                        <th style="width: 200px;">관리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${posts == null or posts.isEmpty()}">
+                        <td colspan="7" style="text-align: center; padding: 3rem; color: #7f8c8d;">
+                            등록된 게시글이 없습니다.
+                        </td>
+                    </tr>
+                    <tr th:each="post : ${posts}">
+                        <td th:text="${post.id}">1</td>
+                        <td>
+                            <strong th:text="${post.title}">게시글 제목</strong>
+                            <span class="badge badge-danger" th:if="${post.isHidden}">숨김</span>
+                        </td>
+                        <td th:text="${post.author}">관리자</td>
+                        <td th:text="${post.viewCount}">0</td>
+                        <td>
+                            <span class="badge" th:classappend="${post.isHidden ? 'badge-danger' : 'badge-success'}"
+                                  th:text="${post.isHidden ? '숨김' : '공개'}">공개</span>
+                        </td>
+                        <td th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd')}">2024-01-01</td>
+                        <td>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <a th:href="@{/admin/boards/{boardId}/posts/{postId}/edit(boardId=${board.id}, postId=${post.id})}"
+                                   class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">수정</a>
+                                <form th:action="@{/admin/boards/{boardId}/posts/{postId}/toggle-hidden(boardId=${board.id}, postId=${post.id})}"
+                                      method="post" style="display: inline;">
+                                    <button type="submit" class="btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;"
+                                            th:text="${post.isHidden ? '공개' : '숨김'}">숨김</button>
+                                </form>
+                                <form th:action="@{/admin/boards/{boardId}/posts/{postId}/delete(boardId=${board.id}, postId=${post.id})}"
+                                      method="post" style="display: inline;"
+                                      onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                                    <button type="submit" class="btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;">삭제</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script th:src="@{/js/admin.js}"></script>
+</body>
+</html>

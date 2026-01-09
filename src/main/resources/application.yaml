@@ -1,3 +1,71 @@
 spring:
   application:
     name: bear
+
+  # R2DBC PostgreSQL 설정
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/bear_db
+    username: postgres
+    password: postgres
+    pool:
+      initial-size: 10
+      max-size: 20
+
+  # Thymeleaf 설정
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+
+  # 파일 업로드 설정
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 20MB
+      max-request-size: 25MB
+
+  # Security 설정 - JWT 사용으로 기본 인증 비활성화
+#  security:
+#    user:
+#      name: admin
+#      password: password
+  # WebFlux Security 추가 설정
+  webflux:
+    base-path: /
+    hiddenmethod:
+      filter:
+        enabled: false
+
+# 애플리케이션 설정
+app:
+  file:
+    upload:
+      base-dir: ${user.home}/bear-uploads
+  recaptcha:
+    secret-key: ${RECAPTCHA_SECRET_KEY:test-secret-key}
+  kakao:
+    map:
+      app-key: ${KAKAO_MAP_APP_KEY:test-app-key}
+  jwt:
+    secret: ${JWT_SECRET:bear-jwt-secret-key-for-development-only-change-in-production-environment}
+    expiration: 86400000  # 24시간 (밀리초)
+
+# Actuator 설정
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# 로깅 설정
+logging:
+  level:
+    com.nalsil.bear: DEBUG
+    org.springframework.r2dbc: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.web.server: TRACE
+    reactor.netty: DEBUG

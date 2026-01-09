@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" th:content="${company != null ? company.name + ' FAQ' : 'FAQ'}">
+    <title th:text="${company != null ? company.name + ' - FAQ' : 'FAQ'}">FAQ</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/public.css}">
+    <style>
+        .faq-section {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .faq-header {
+            margin-bottom: 2rem;
+        }
+        .faq-filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .category-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .category-btn.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .faq-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        .faq-question {
+            padding: 1.5rem;
+            background: #f8f9fa;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+        .faq-question:hover {
+            background: #e9ecef;
+        }
+        .faq-question h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #2c3e50;
+        }
+        .faq-toggle {
+            font-size: 1.5rem;
+            color: #7f8c8d;
+            transition: transform 0.3s;
+        }
+        .faq-answer {
+            padding: 1.5rem;
+            display: none;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+        .faq-item.active .faq-answer {
+            display: block;
+        }
+        .faq-item.active .faq-toggle {
+            transform: rotate(180deg);
+        }
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <div th:replace="~{layout/layout :: header}"></div>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+        <div class="faq-section">
+            <div class="faq-header">
+                <h1>자주 묻는 질문 (FAQ)</h1>
+                <p>자주 묻는 질문에 대한 답변을 확인하세요.</p>
+            </div>
+
+            <!-- 필터 및 검색 -->
+            <div class="faq-filters">
+                <a th:href="@{/{code}/faq(code=${company.code})}"
+                   th:class="${selectedCategory == null ? 'category-btn active' : 'category-btn'}">전체</a>
+                <a th:each="cat : ${categories}"
+                   th:href="@{/{code}/faq(code=${company.code}, category=${cat})}"
+                   th:class="${selectedCategory == cat ? 'category-btn active' : 'category-btn'}"
+                   th:text="${cat}">카테고리</a>
+
+                <form th:action="@{/{code}/faq(code=${company.code})}" method="get" class="search-box">
+                    <input type="text" name="keyword" th:value="${keyword}"
+                           placeholder="검색어를 입력하세요">
+                </form>
+            </div>
+
+            <!-- FAQ 목록 -->
+            <div class="faq-list" th:if="${faqs != null and !faqs.isEmpty()}">
+                <div class="faq-item" th:each="faq : ${faqs}">
+                    <div class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+                        <h3 th:text="${faq.question}">질문</h3>
+                        <span class="faq-toggle">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p th:text="${faq.answer}">답변</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 결과 없음 -->
+            <div class="no-results" th:if="${faqs == null or faqs.isEmpty()}">
+                <p>등록된 FAQ가 없습니다.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- 푸터 -->
+    <div th:replace="~{layout/layout :: footer}"></div>
+
+    <script th:src="@{/js/common.js}"></script>
+</body>
+</html>

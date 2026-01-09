@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>기업 선택 - 슈퍼관리자</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 3rem;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .alert-error {
+            background-color: #fee;
+            color: #c33;
+            border-left: 4px solid #c33;
+        }
+
+        .company-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .company-card {
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .company-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .company-card.inactive {
+            opacity: 0.6;
+            background-color: #f8f9fa;
+        }
+
+        .company-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .company-code {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            font-family: monospace;
+            margin-bottom: 0.5rem;
+        }
+
+        .company-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .company-status.active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .company-status.inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .form-section {
+            border-top: 1px solid #e1e8ed;
+            padding-top: 1.5rem;
+        }
+
+        .form-section h2 {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e8ed;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            background-color: white;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.875rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #7f8c8d;
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏢 기업 선택</h1>
+        <p class="subtitle">관리할 기업을 선택하세요</p>
+
+        <!-- JWT 기반 인증 안내 -->
+        <div class="alert" style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 1rem; margin-bottom: 1.5rem; border-radius: 6px; color: #856404;">
+            <strong>⚠️ JWT 기반 인증 안내</strong><br>
+            현재 JWT 토큰 기반 인증을 사용하고 있습니다.<br>
+            기업 전환 기능은 지원되지 않으며, 다른 기업으로 전환하려면 <strong>로그아웃 후 재로그인</strong>이 필요합니다.
+        </div>
+
+        <!-- 에러 메시지 -->
+        <div class="alert alert-error" th:if="${param.error}">
+            <span th:if="${param.error[0] == 'invalid_company'}">유효하지 않은 기업입니다.</span>
+            <span th:if="${param.error[0] == 'jwt_not_supported'}">JWT 기반 인증에서는 기업 전환이 지원되지 않습니다. 로그아웃 후 다시 로그인해주세요.</span>
+        </div>
+
+        <!-- 기업이 없는 경우 -->
+        <div class="empty-state" th:if="${companies == null or companies.isEmpty()}">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+            <p>등록된 기업이 없습니다.</p>
+        </div>
+
+        <!-- 기업 카드 그리드 (3개 이하일 때만 표시) - JWT 기반 인증에서는 비활성화 -->
+        <div class="company-grid" th:if="${companies != null and companies.size() <= 3}">
+            <div th:each="company : ${companies}" class="company-card" style="opacity: 0.6; cursor: not-allowed;">
+                <div class="company-name" th:text="${company.name}">기업명</div>
+                <div class="company-code" th:text="${company.code}">company-code</div>
+                <span class="company-status"
+                      th:classappend="${company.isActive ? 'active' : 'inactive'}"
+                      th:text="${company.isActive ? '활성' : '비활성'}">활성</span>
+                <div style="margin-top: 0.5rem; font-size: 0.75rem; color: #856404;">
+                    ℹ️ 재로그인 필요
+                </div>
+            </div>
+        </div>
+
+        <!-- 기업 선택 폼 (4개 이상일 때) - JWT 기반 인증에서는 비활성화 -->
+        <div class="form-section" th:if="${companies != null and companies.size() > 3}">
+            <h2>기업 목록</h2>
+            <div class="form-group">
+                <label for="companyId">기업 정보 (전환 불가)</label>
+                <select id="companyId" name="companyId" disabled style="background-color: #f5f5f5; cursor: not-allowed;">
+                    <option value="">재로그인을 통해 기업을 선택하세요</option>
+                    <option th:each="company : ${companies}"
+                            th:value="${company.id}"
+                            th:text="${company.name + ' (' + company.code + ')' + (!company.isActive ? ' - 비활성' : '')}">
+                        기업명 (code)
+                    </option>
+                </select>
+            </div>
+            <a th:href="@{/admin/logout}" style="display: block; width: 100%; padding: 0.875rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-align: center; text-decoration: none; border-radius: 6px; font-size: 1rem; font-weight: 600;">
+                로그아웃하고 다시 로그인
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // JWT 기반 인증: 기업 전환 불가 안내
+        document.querySelectorAll('.company-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('JWT 토큰 기반 인증을 사용 중입니다.\n다른 기업으로 전환하려면 로그아웃 후 다시 로그인해주세요.');
+            });
+        });
+    </script>
+</body>
+</html>

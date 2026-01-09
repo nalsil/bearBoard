@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>유튜브 영상 관리</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="admin-header">
+        <div class="admin-header-content">
+            <h1>유튜브 영상 관리</h1>
+            <div class="admin-user-info">
+                <a th:href="@{/admin/logout}" class="btn-logout">로그아웃</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 사이드바 -->
+    <aside class="admin-sidebar">
+        <nav class="admin-nav">
+            <a th:href="@{/admin/dashboard}" class="nav-item">대시보드</a>
+            <a th:href="@{/admin/boards/1/posts}" class="nav-item">게시판 관리</a>
+            <a th:href="@{/admin/faqs}" class="nav-item">FAQ 관리</a>
+            <a th:href="@{/admin/qnas}" class="nav-item">QnA 관리</a>
+            <a th:href="@{/admin/youtube}" class="nav-item active">영상 관리</a>
+            <a th:href="@{/admin/products}" class="nav-item">상품 관리</a>
+        </nav>
+    </aside>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="admin-main">
+        <div class="page-header">
+            <h1>유튜브 영상 목록</h1>
+            <a th:href="@{/admin/youtube/new}" class="btn-primary">영상 등록</a>
+        </div>
+
+        <!-- 성공 메시지 -->
+        <div class="alert alert-success" th:if="${param.success}">
+            <span th:if="${param.success[0] == 'created'}">영상이 등록되었습니다.</span>
+            <span th:if="${param.success[0] == 'updated'}">영상이 수정되었습니다.</span>
+            <span th:if="${param.success[0] == 'deleted'}">영상이 삭제되었습니다.</span>
+        </div>
+
+        <!-- 에러 메시지 -->
+        <div class="alert alert-error" th:if="${param.error}">
+            <span th:if="${param.error[0] == 'invalid_url'}">유효하지 않은 유튜브 URL입니다.</span>
+        </div>
+
+        <div class="data-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">ID</th>
+                        <th style="width: 150px;">썸네일</th>
+                        <th>제목</th>
+                        <th style="width: 80px;">순서</th>
+                        <th style="width: 80px;">상태</th>
+                        <th style="width: 220px;">관리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${videos == null or videos.isEmpty()}">
+                        <td colspan="6" style="text-align: center; padding: 3rem; color: #7f8c8d;">
+                            등록된 영상이 없습니다.
+                        </td>
+                    </tr>
+                    <tr th:each="video : ${videos}">
+                        <td th:text="${video.id}">1</td>
+                        <td>
+                            <img th:if="${video.thumbnailUrl}"
+                                 th:src="${video.thumbnailUrl}"
+                                 th:alt="${video.title}"
+                                 style="width: 120px; height: 68px; object-fit: cover; border-radius: 4px;">
+                        </td>
+                        <td th:text="${video.title}">영상 제목</td>
+                        <td th:text="${video.displayOrder}">0</td>
+                        <td>
+                            <span class="badge" th:classappend="${video.isHidden ? 'badge-danger' : 'badge-success'}"
+                                  th:text="${video.isHidden ? '숨김' : '공개'}">공개</span>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <a th:href="@{/admin/youtube/{id}/edit(id=${video.id})}"
+                                   class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">수정</a>
+                                <form th:action="@{/admin/youtube/{id}/toggle-hidden(id=${video.id})}"
+                                      method="post" style="display: inline;">
+                                    <button type="submit" class="btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;"
+                                            th:text="${video.isHidden ? '공개' : '숨김'}">숨김</button>
+                                </form>
+                                <form th:action="@{/admin/youtube/{id}/delete(id=${video.id})}"
+                                      method="post" style="display: inline;"
+                                      onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                                    <button type="submit" class="btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;">삭제</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script th:src="@{/js/admin.js}"></script>
+</body>
+</html>

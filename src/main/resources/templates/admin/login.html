@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 로그인</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .login-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            padding: 2.5rem;
+        }
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .login-header h1 {
+            font-size: 1.75rem;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        .login-header p {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.875rem;
+            border: 1px solid #dfe6e9;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        .btn-login {
+            width: 100%;
+            padding: 0.875rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn-login:hover {
+            transform: translateY(-2px);
+        }
+        .btn-login:active {
+            transform: translateY(0);
+        }
+        .alert {
+            padding: 0.875rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        .alert-error {
+            background: #ffe5e5;
+            color: #c0392b;
+            border: 1px solid #f5b7b1;
+        }
+        .alert-success {
+            background: #e8f8f5;
+            color: #27ae60;
+            border: 1px solid #a9dfbf;
+        }
+        .footer-text {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #7f8c8d;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>관리자 로그인</h1>
+            <p>관리자 계정으로 로그인하세요</p>
+        </div>
+
+        <!-- 에러 메시지 -->
+        <div class="alert alert-error" th:if="${error}">
+            <span th:text="${error}">로그인에 실패했습니다.</span>
+        </div>
+
+        <!-- 로그아웃 성공 메시지 -->
+        <div class="alert alert-success" th:if="${param.logout}">
+            로그아웃되었습니다.
+        </div>
+
+        <form method="post" th:action="@{/admin/login}">
+            <div class="form-group">
+                <label for="username">사용자명</label>
+                <input type="text" id="username" name="username" required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <button type="submit" class="btn-login">로그인</button>
+        </form>
+
+        <div class="footer-text">
+            관리자 전용 페이지입니다
+        </div>
+    </div>
+</body>
+</html>

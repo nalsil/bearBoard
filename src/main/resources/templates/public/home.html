@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" th:content="${company != null ? company.description : '기업 홈페이지'}">
+    <title th:text="${company != null ? company.name + ' - 홈' : '홈페이지'}">홈</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/public.css}">
+</head>
+<body>
+    <!-- 헤더 -->
+    <div th:replace="~{layout/layout :: header}"></div>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+        <!-- 히어로 섹션 -->
+        <section class="hero-section" th:if="${company != null}">
+            <div class="container">
+                <h1 th:text="${company.name}">회사명</h1>
+                <p class="hero-description" th:text="${company.description}">회사 설명</p>
+                <div class="hero-actions">
+                    <a th:href="@{/{code}/about(code=${company.code})}" class="btn btn-primary">회사 소개</a>
+                    <a th:href="@{/{code}/products(code=${company.code})}" class="btn btn-secondary">상품 보기</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 상품 섹션 -->
+        <section class="products-section" th:if="${products != null and !products.isEmpty()}">
+            <div class="container">
+                <h2>주요 상품</h2>
+                <div class="product-grid">
+                    <div class="product-card" th:each="product : ${products}">
+                        <div class="product-image">
+                            <img th:if="${product.imageUrl}" th:src="${product.imageUrl}" th:alt="${product.name}">
+                            <div th:unless="${product.imageUrl}" class="product-image-placeholder">이미지 없음</div>
+                        </div>
+                        <div class="product-info">
+                            <h3 th:text="${product.name}">상품명</h3>
+                            <p class="product-category" th:if="${product.category}" th:text="${product.category}">카테고리</p>
+                            <p class="product-price" th:if="${product.price}" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '원'">가격</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="section-footer">
+                    <a th:href="@{/{code}/products(code=${company.code})}" class="btn btn-outline">전체 상품 보기</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 연락처 섹션 -->
+        <section class="contact-section" th:if="${company != null}">
+            <div class="container">
+                <h2>연락처</h2>
+                <div class="contact-info">
+                    <div class="contact-item" th:if="${company.address}">
+                        <strong>주소</strong>
+                        <p th:text="${company.address}">주소</p>
+                    </div>
+                    <div class="contact-item" th:if="${company.phone}">
+                        <strong>전화</strong>
+                        <p th:text="${company.phone}">전화번호</p>
+                    </div>
+                    <div class="contact-item" th:if="${company.email}">
+                        <strong>이메일</strong>
+                        <p><a th:href="'mailto:' + ${company.email}" th:text="${company.email}">이메일</a></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 푸터 -->
+    <div th:replace="~{layout/layout :: footer}"></div>
+
+    <script th:src="@{/js/common.js}"></script>
+</body>
+</html>

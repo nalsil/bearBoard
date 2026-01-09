@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${board != null ? board.name + ' - ' + (company != null ? company.name : '') : '게시판'}">게시판</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/public.css}">
+</head>
+<body>
+    <!-- 헤더 -->
+    <div th:replace="~{layout/layout :: header}"></div>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+        <div class="container">
+            <header class="page-header">
+                <h1 th:text="${board != null ? board.name : '게시판'}">게시판</h1>
+            </header>
+
+            <!-- 게시글 목록 -->
+            <div class="board-list" th:if="${posts != null and !posts.isEmpty()}">
+                <table class="post-table">
+                    <thead>
+                        <tr>
+                            <th class="col-number">번호</th>
+                            <th class="col-title">제목</th>
+                            <th class="col-author">작성자</th>
+                            <th class="col-date">작성일</th>
+                            <th class="col-views">조회수</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="post, stat : ${posts}">
+                            <td th:text="${totalPosts - (currentPage * 10 + stat.index)}">번호</td>
+                            <td class="title-cell">
+                                <a th:href="@{/{code}/board/{type}/{id}(code=${company.code},type=${board.type},id=${post.id})}"
+                                   th:text="${post.title}">제목</a>
+                            </td>
+                            <td th:text="${post.author}">작성자</td>
+                            <td th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd')}">작성일</td>
+                            <td th:text="${post.viewCount}">조회수</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 페이지네이션 -->
+                <nav class="pagination" th:if="${totalPages > 1}">
+                    <a th:href="@{/{code}/board/{type}(code=${company.code},type=${board.type},page=${currentPage - 1})}"
+                       th:classappend="${currentPage == 0 ? 'disabled' : ''}"
+                       class="page-link">이전</a>
+
+                    <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                        <a th:href="@{/{code}/board/{type}(code=${company.code},type=${board.type},page=${i})}"
+                           th:text="${i + 1}"
+                           th:classappend="${i == currentPage ? 'active' : ''}"
+                           class="page-link">페이지</a>
+                    </span>
+
+                    <a th:href="@{/{code}/board/{type}(code=${company.code},type=${board.type},page=${currentPage + 1})}"
+                       th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}"
+                       class="page-link">다음</a>
+                </nav>
+            </div>
+
+            <!-- 게시글 없음 -->
+            <div class="empty-message" th:if="${posts == null or posts.isEmpty()}">
+                <p th:text="${message != null ? message : '등록된 게시글이 없습니다.'}">게시글이 없습니다</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- 푸터 -->
+    <div th:replace="~{layout/layout :: footer}"></div>
+
+    <script th:src="@{/js/common.js}"></script>
+</body>
+</html>

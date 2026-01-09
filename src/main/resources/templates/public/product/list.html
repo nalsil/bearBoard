@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${company != null ? '상품 - ' + company.name : '상품'}">상품</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/public.css}">
+</head>
+<body>
+    <!-- 헤더 -->
+    <div th:replace="~{layout/layout :: header}"></div>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+        <div class="container">
+            <header class="page-header">
+                <h1>상품</h1>
+            </header>
+
+            <!-- 상품 목록 -->
+            <div class="product-grid" th:if="${products != null and !products.isEmpty()}">
+                <div class="product-card" th:each="product : ${products}">
+                    <div class="product-image">
+                        <img th:if="${product.imageUrl}" th:src="${product.imageUrl}" th:alt="${product.name}">
+                        <div th:unless="${product.imageUrl}" class="product-image-placeholder">이미지 없음</div>
+                    </div>
+                    <div class="product-info">
+                        <h3 th:text="${product.name}">상품명</h3>
+                        <p class="product-category" th:if="${product.category}" th:text="${product.category}">카테고리</p>
+                        <p class="product-description" th:if="${product.description}" th:text="${product.description}">설명</p>
+                        <p class="product-price" th:if="${product.price}" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '원'">가격</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 상품 없음 -->
+            <div class="empty-message" th:if="${products == null or products.isEmpty()}">
+                <p>등록된 상품이 없습니다.</p>
+            </div>
+
+            <!-- 페이지네이션 (추후 추가) -->
+            <!-- TODO: 페이지네이션 구현 -->
+        </div>
+    </main>
+
+    <!-- 푸터 -->
+    <div th:replace="~{layout/layout :: footer}"></div>
+
+    <script th:src="@{/js/common.js}"></script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: bear-test
+
+  # R2DBC Test 설정 (H2 인메모리 데이터베이스 사용)
+  r2dbc:
+    url: r2dbc:h2:mem:///testdb?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+
+  # SQL 초기화 설정
+  sql:
+    init:
+      mode: always
+
+  # Redis Test 설정 (임베디드 사용)
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  session:
+    store-type: redis
+    timeout: 1800s
+
+  # Thymeleaf 설정
+  thymeleaf:
+    cache: false
+
+  # 파일 업로드 설정
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 20MB
+      max-request-size: 25MB
+
+  # Security 설정
+  security:
+    user:
+      name: admin
+      password: password
+
+# 애플리케이션 설정
+app:
+  file:
+    upload:
+      base-dir: ${java.io.tmpdir}/bear-test-uploads
+  recaptcha:
+    secret-key: test-secret-key
+  kakao:
+    map:
+      app-key: test-app-key
+
+# 로깅 설정
+logging:
+  level:
+    com.nalsil.bear: DEBUG
+    org.springframework.r2dbc: DEBUG
+    org.springframework.security: WARN

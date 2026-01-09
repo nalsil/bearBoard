@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bear - 멀티 테넌트 홈페이지 플랫폼</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .index-container {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .index-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+
+        .index-header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .index-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .company-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .company-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+
+        .company-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+        }
+
+        .company-logo {
+            width: 100%;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .company-logo-placeholder {
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .company-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .company-description {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            height: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+
+        .company-info {
+            font-size: 0.85rem;
+            color: #999;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .company-code {
+            display: inline-block;
+            background: #f0f0f0;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+            color: #667eea;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .footer-info {
+            text-align: center;
+            color: white;
+            margin-top: 50px;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .index-header h1 {
+                font-size: 2rem;
+            }
+
+            .index-header p {
+                font-size: 1rem;
+            }
+
+            .company-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="index-container">
+        <!-- 헤더 -->
+        <header class="index-header">
+            <h1>🐻 Bear Platform</h1>
+            <p>접속 가능한 기업 홈페이지를 선택하세요</p>
+        </header>
+
+        <!-- 회사 목록 -->
+        <div class="company-list" th:if="${companies != null and !companies.isEmpty()}">
+            <a th:each="company : ${companies}"
+               th:href="@{/{code}(code=${company.code})}"
+               class="company-card">
+                <!-- 로고 -->
+                <div th:if="${company.logoUrl}">
+                    <img th:src="${company.logoUrl}"
+                         th:alt="${company.name} + ' 로고'"
+                         class="company-logo">
+                </div>
+                <div th:unless="${company.logoUrl}" class="company-logo-placeholder">
+                    <span th:text="${#strings.substring(company.name, 0, 1)}">회</span>
+                </div>
+
+                <!-- 회사 정보 -->
+                <h2 class="company-name" th:text="${company.name}">회사명</h2>
+                <p class="company-description"
+                   th:text="${company.description != null ? company.description : '기업 소개'}">
+                    회사 설명
+                </p>
+                <div class="company-info">
+                    <span class="company-code" th:text="${company.code}">company-code</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- 회사 없음 -->
+        <div class="empty-message" th:if="${companies == null or companies.isEmpty()}">
+            <p>현재 접속 가능한 회사가 없습니다.</p>
+        </div>
+
+        <!-- 푸터 -->
+        <footer class="footer-info">
+            <p>Bear - Multi-tenant Homepage Platform &copy; 2026</p>
+        </footer>
+    </div>
+</body>
+</html>

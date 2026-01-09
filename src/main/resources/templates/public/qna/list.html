@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" th:content="${company != null ? company.name + ' QnA' : 'QnA'}">
+    <title th:text="${company != null ? company.name + ' - QnA' : 'QnA'}">QnA</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/public.css}">
+    <style>
+        .qna-section {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .qna-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .btn-ask {
+            background: #3498db;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .btn-ask:hover {
+            background: #2980b9;
+        }
+        .qna-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            background: white;
+        }
+        .qna-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+        .qna-status.answered {
+            background: #d4edda;
+            color: #155724;
+        }
+        .qna-status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .qna-title {
+            font-size: 1.25rem;
+            margin: 0.5rem 0;
+            color: #2c3e50;
+        }
+        .qna-meta {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        .qna-link {
+            text-decoration: none;
+            color: inherit;
+        }
+        .qna-link:hover .qna-title {
+            color: #3498db;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+        .page-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #333;
+        }
+        .page-btn.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        .page-btn:hover:not(.active) {
+            background: #f8f9fa;
+        }
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #7f8c8d;
+        }
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <div th:replace="~{layout/layout :: header}"></div>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+        <div class="qna-section">
+            <div class="qna-header">
+                <div>
+                    <h1>Q&A</h1>
+                    <p>궁금한 점을 질문하고 답변을 확인하세요.</p>
+                </div>
+                <a th:href="@{/{code}/qna/new(code=${company.code})}" class="btn-ask">질문하기</a>
+            </div>
+
+            <!-- 성공 메시지 -->
+            <div class="success-message" th:if="${param.success}">
+                질문이 성공적으로 등록되었습니다. 답변을 기다려주세요.
+            </div>
+
+            <!-- QnA 목록 -->
+            <div class="qna-list" th:if="${qnas != null and !qnas.isEmpty()}">
+                <div class="qna-item" th:each="qna : ${qnas}">
+                    <a th:href="@{/{code}/qna/{id}(code=${company.code}, id=${qna.id})}" class="qna-link">
+                        <span class="qna-status" th:classappend="${qna.isAnswered ? 'answered' : 'pending'}"
+                              th:text="${qna.isAnswered ? '답변완료' : '답변대기'}">상태</span>
+                        <h3 class="qna-title" th:text="${qna.questionTitle}">질문 제목</h3>
+                        <div class="qna-meta">
+                            <span th:text="${#temporals.format(qna.createdAt, 'yyyy-MM-dd HH:mm')}">작성일</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 결과 없음 -->
+            <div class="no-results" th:if="${qnas == null or qnas.isEmpty()}">
+                <p>등록된 질문이 없습니다.</p>
+                <a th:href="@{/{code}/qna/new(code=${company.code})}" class="btn-ask">첫 질문하기</a>
+            </div>
+
+            <!-- 페이징 -->
+            <div class="pagination" th:if="${totalPages > 1}">
+                <a th:if="${currentPage > 0}"
+                   th:href="@{/{code}/qna(code=${company.code}, page=${currentPage - 1}, size=${pageSize})}"
+                   class="page-btn">이전</a>
+
+                <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                    <a th:href="@{/{code}/qna(code=${company.code}, page=${i}, size=${pageSize})}"
+                       th:class="${i == currentPage ? 'page-btn active' : 'page-btn'}"
+                       th:text="${i + 1}">1</a>
+                </span>
+
+                <a th:if="${currentPage < totalPages - 1}"
+                   th:href="@{/{code}/qna(code=${company.code}, page=${currentPage + 1}, size=${pageSize})}"
+                   class="page-btn">다음</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- 푸터 -->
+    <div th:replace="~{layout/layout :: footer}"></div>
+
+    <script th:src="@{/js/common.js}"></script>
+</body>
+</html>

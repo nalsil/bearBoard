@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" th:content="${company != null ? company.name + ' 영상 갤러리' : '영상 갤러리'}">
+    <title th:text="${company != null ? company.name + ' - 영상 갤러리' : '영상 갤러리'}">영상 갤러리</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/public.css}">
+    <style>
+        .youtube-section {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .youtube-header {
+            margin-bottom: 2rem;
+        }
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .video-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        .video-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .video-thumbnail {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 비율 */
+            background: #000;
+            overflow: hidden;
+        }
+        .video-thumbnail img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .video-play-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 68px;
+            height: 48px;
+            background: rgba(255, 0, 0, 0.8);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .video-play-btn::before {
+            content: '';
+            width: 0;
+            height: 0;
+            border-left: 15px solid white;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            margin-left: 3px;
+        }
+        .video-info {
+            padding: 1rem;
+        }
+        .video-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0 0 0.5rem 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        .video-description {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        .no-videos {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <div th:replace="~{layout/layout :: header}"></div>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+        <div class="youtube-section">
+            <div class="youtube-header">
+                <h1>영상 갤러리</h1>
+                <p>다양한 영상을 확인하세요.</p>
+            </div>
+
+            <!-- 영상 그리드 -->
+            <div class="video-grid" th:if="${videos != null and !videos.isEmpty()}">
+                <div class="video-card" th:each="video : ${videos}"
+                     th:onclick="'location.href=\'' + @{/{code}/youtube/{id}(code=${company.code}, id=${video.id})} + '\''">
+                    <div class="video-thumbnail">
+                        <img th:if="${video.thumbnailUrl}"
+                             th:src="${video.thumbnailUrl}"
+                             th:alt="${video.title}">
+                        <div class="video-play-btn"></div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title" th:text="${video.title}">영상 제목</h3>
+                        <p class="video-description" th:if="${video.description}"
+                           th:text="${video.description}">영상 설명</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 영상 없음 -->
+            <div class="no-videos" th:if="${videos == null or videos.isEmpty()}">
+                <p>등록된 영상이 없습니다.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- 푸터 -->
+    <div th:replace="~{layout/layout :: footer}"></div>
+
+    <script th:src="@{/js/common.js}"></script>
+</body>
+</html>

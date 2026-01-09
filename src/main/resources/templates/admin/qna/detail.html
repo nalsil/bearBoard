@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QnA 상세</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <style>
+        .qna-detail-container {
+            max-width: 900px;
+        }
+        .qna-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 1.5rem;
+        }
+        .qna-section h3 {
+            margin-bottom: 1rem;
+            color: #2c3e50;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #3498db;
+        }
+        .qna-meta {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1rem;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        .qna-content {
+            line-height: 1.8;
+            color: #2c3e50;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="admin-header">
+        <div class="admin-header-content">
+            <h1>QnA 상세</h1>
+            <div class="admin-user-info">
+                <a th:href="@{/admin/logout}" class="btn-logout">로그아웃</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 사이드바 -->
+    <aside class="admin-sidebar">
+        <nav class="admin-nav">
+            <a th:href="@{/admin/dashboard}" class="nav-item">대시보드</a>
+            <a th:href="@{/admin/boards/1/posts}" class="nav-item">게시판 관리</a>
+            <a th:href="@{/admin/faqs}" class="nav-item">FAQ 관리</a>
+            <a th:href="@{/admin/qnas}" class="nav-item active">QnA 관리</a>
+            <a th:href="@{/admin/youtube}" class="nav-item">영상 관리</a>
+            <a th:href="@{/admin/products}" class="nav-item">상품 관리</a>
+        </nav>
+    </aside>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="admin-main">
+        <div class="qna-detail-container">
+            <div class="page-header">
+                <h1>QnA 상세</h1>
+                <a th:href="@{/admin/qnas}" class="btn-secondary">목록으로</a>
+            </div>
+
+            <!-- 질문 섹션 -->
+            <div class="qna-section">
+                <h3>질문</h3>
+                <div class="qna-meta">
+                    <span>질문자: <strong th:text="${qna.askerEmail}">user@example.com</strong></span>
+                    <span>등록일: <strong th:text="${#temporals.format(qna.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 12:00</strong></span>
+                </div>
+                <h4 style="margin-bottom: 1rem; font-size: 1.25rem;" th:text="${qna.questionTitle}">질문 제목</h4>
+                <div class="qna-content" th:text="${qna.questionBody}">질문 내용</div>
+            </div>
+
+            <!-- 답변 섹션 -->
+            <div class="qna-section">
+                <h3>답변</h3>
+                <div th:if="${qna.isAnswered}">
+                    <div class="qna-meta">
+                        <span>답변일: <strong th:text="${#temporals.format(qna.answeredAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 14:00</strong></span>
+                    </div>
+                    <div class="qna-content" th:text="${qna.answerBody}">답변 내용</div>
+                </div>
+
+                <!-- 답변 작성 폼 -->
+                <form th:if="${!qna.isAnswered or qna.answerBody == null}"
+                      method="post"
+                      th:action="@{/admin/qnas/{id}/answer(id=${qna.id})}">
+                    <div class="form-group">
+                        <label for="answer">답변 내용 *</label>
+                        <textarea id="answer" name="answer" required
+                                  style="min-height: 200px;"
+                                  th:text="${qna.answerBody}"></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary">답변 등록</button>
+                </form>
+
+                <!-- 답변 수정 폼 -->
+                <form th:if="${qna.isAnswered and qna.answerBody != null}"
+                      method="post"
+                      th:action="@{/admin/qnas/{id}/answer(id=${qna.id})}"
+                      style="margin-top: 1.5rem;">
+                    <div class="form-group">
+                        <label for="answer-edit">답변 수정</label>
+                        <textarea id="answer-edit" name="answer" required
+                                  style="min-height: 200px;"
+                                  th:text="${qna.answerBody}"></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary">답변 수정</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script th:src="@{/js/admin.js}"></script>
+</body>
+</html>

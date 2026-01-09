@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" th:content="${company != null ? company.description : '기업 홈페이지'}">
+    <title th:text="${pageTitle != null ? pageTitle + ' - ' + (company != null ? company.name : '홈페이지') : (company != null ? company.name : '홈페이지')}">홈페이지</title>
+
+    <!-- 공통 CSS -->
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/public.css}">
+
+    <!-- 추가 CSS 삽입 위치 -->
+    <th:block layout:fragment="additional_css"></th:block>
+</head>
+<body>
+    <!-- 헤더 -->
+    <header th:fragment="header" class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a th:href="@{/{code}(code=${company != null ? company.code : ''})}" th:if="${company != null}">
+                        <img th:if="${company.logoUrl}" th:src="${company.logoUrl}" th:alt="${company.name} + ' 로고'">
+                        <span th:unless="${company.logoUrl}" th:text="${company.name}">회사명</span>
+                    </a>
+                </div>
+                <nav class="nav">
+                    <ul>
+                        <li><a th:href="@{/{code}(code=${company != null ? company.code : ''})}" th:if="${company != null}">홈</a></li>
+                        <li><a th:href="@{/{code}/about(code=${company != null ? company.code : ''})}" th:if="${company != null}">회사 소개</a></li>
+                        <li><a th:href="@{/{code}/products(code=${company != null ? company.code : ''})}" th:if="${company != null}">상품</a></li>
+                        <li><a th:href="@{/{code}/board/notice(code=${company != null ? company.code : ''})}" th:if="${company != null}">공지사항</a></li>
+                        <li><a th:href="@{/{code}/board/press(code=${company != null ? company.code : ''})}" th:if="${company != null}">보도자료</a></li>
+                        <li><a th:href="@{/{code}/faq(code=${company != null ? company.code : ''})}" th:if="${company != null}">FAQ</a></li>
+                        <li><a th:href="@{/{code}/qna(code=${company != null ? company.code : ''})}" th:if="${company != null}">문의하기</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main layout:fragment="content" class="main-content">
+        <!-- 각 페이지의 컨텐츠가 여기에 삽입됩니다 -->
+    </main>
+
+    <!-- 푸터 -->
+    <footer th:fragment="footer" class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info" th:if="${company != null}">
+                    <h3 th:text="${company.name}">회사명</h3>
+                    <p th:if="${company.address}" th:text="'주소: ' + ${company.address}">주소</p>
+                    <p th:if="${company.phone}" th:text="'전화: ' + ${company.phone}">전화</p>
+                    <p th:if="${company.email}" th:text="'이메일: ' + ${company.email}">이메일</p>
+                </div>
+                <div class="footer-copyright">
+                    <p th:text="'Copyright © ' + ${#temporals.year(#temporals.createNow())} + ' ' + ${company != null ? company.name : ''} + '. All rights reserved.'">
+                        Copyright © 2025. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 공통 JavaScript -->
+    <script th:src="@{/js/common.js}"></script>
+
+    <!-- 추가 JavaScript 삽입 위치 -->
+    <th:block layout:fragment="additional_js"></th:block>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" th:content="${video != null ? video.title : '영상 재생'}">
+    <title th:text="${video != null ? video.title : '영상 재생'}">영상 재생</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/public.css}">
+    <style>
+        .player-section {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 비율 */
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .video-details {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        .video-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0 0 1rem 0;
+        }
+        .video-description {
+            color: #34495e;
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+        .btn-back {
+            background: #95a5a6;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+        .btn-back:hover {
+            background: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <div th:replace="~{layout/layout :: header}"></div>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+        <div class="player-section" th:if="${video != null and videoId != null}">
+            <!-- 영상 플레이어 -->
+            <div class="video-container">
+                <iframe th:src="'https://www.youtube.com/embed/' + ${videoId}"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen>
+                </iframe>
+            </div>
+
+            <!-- 영상 정보 -->
+            <div class="video-details">
+                <h1 class="video-title" th:text="${video.title}">영상 제목</h1>
+                <p class="video-description" th:if="${video.description}"
+                   th:text="${video.description}">영상 설명</p>
+            </div>
+
+            <a th:href="@{/{code}/youtube(code=${company.code})}" class="btn-back">목록으로</a>
+        </div>
+
+        <!-- 영상 없음 -->
+        <div class="player-section" th:if="${video == null or videoId == null}"
+             style="text-align: center; padding: 4rem 2rem; color: #7f8c8d;">
+            <p>영상을 찾을 수 없습니다.</p>
+            <a th:href="@{/{code}/youtube(code=${company.code})}" class="btn-back">목록으로</a>
+        </div>
+    </main>
+
+    <!-- 푸터 -->
+    <div th:replace="~{layout/layout :: footer}"></div>
+
+    <script th:src="@{/js/common.js}"></script>
+</body>
+</html>

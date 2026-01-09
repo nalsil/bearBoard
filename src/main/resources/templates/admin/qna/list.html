@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QnA 관리</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="admin-header">
+        <div class="admin-header-content">
+            <h1>QnA 관리</h1>
+            <div class="admin-user-info">
+                <a th:href="@{/admin/logout}" class="btn-logout">로그아웃</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 사이드바 -->
+    <aside class="admin-sidebar">
+        <nav class="admin-nav">
+            <a th:href="@{/admin/dashboard}" class="nav-item">대시보드</a>
+            <a th:href="@{/admin/boards/1/posts}" class="nav-item">게시판 관리</a>
+            <a th:href="@{/admin/faqs}" class="nav-item">FAQ 관리</a>
+            <a th:href="@{/admin/qnas}" class="nav-item active">QnA 관리</a>
+            <a th:href="@{/admin/youtube}" class="nav-item">영상 관리</a>
+            <a th:href="@{/admin/products}" class="nav-item">상품 관리</a>
+        </nav>
+    </aside>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="admin-main">
+        <div class="page-header">
+            <h1>QnA 목록</h1>
+        </div>
+
+        <!-- 성공 메시지 -->
+        <div class="alert alert-success" th:if="${param.success}">
+            <span th:if="${param.success[0] == 'answered'}">답변이 등록되었습니다.</span>
+            <span th:if="${param.success[0] == 'deleted'}">QnA가 삭제되었습니다.</span>
+        </div>
+
+        <div class="data-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">ID</th>
+                        <th>질문 제목</th>
+                        <th style="width: 150px;">질문자 이메일</th>
+                        <th style="width: 100px;">답변 상태</th>
+                        <th style="width: 80px;">상태</th>
+                        <th style="width: 140px;">등록일</th>
+                        <th style="width: 200px;">관리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${qnas == null or qnas.isEmpty()}">
+                        <td colspan="7" style="text-align: center; padding: 3rem; color: #7f8c8d;">
+                            등록된 QnA가 없습니다.
+                        </td>
+                    </tr>
+                    <tr th:each="qna : ${qnas}">
+                        <td th:text="${qna.id}">1</td>
+                        <td>
+                            <a th:href="@{/admin/qnas/{id}(id=${qna.id})}"
+                               style="color: #3498db; text-decoration: none;"
+                               th:text="${qna.questionTitle}">질문 제목</a>
+                        </td>
+                        <td th:text="${qna.askerEmail}">user@example.com</td>
+                        <td>
+                            <span class="badge" th:classappend="${qna.isAnswered ? 'badge-success' : 'badge-warning'}"
+                                  th:text="${qna.isAnswered ? '답변완료' : '답변대기'}">답변대기</span>
+                        </td>
+                        <td>
+                            <span class="badge" th:classappend="${qna.isHidden ? 'badge-danger' : 'badge-success'}"
+                                  th:text="${qna.isHidden ? '숨김' : '공개'}">공개</span>
+                        </td>
+                        <td th:text="${#temporals.format(qna.createdAt, 'yyyy-MM-dd')}">2024-01-01</td>
+                        <td>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <a th:href="@{/admin/qnas/{id}(id=${qna.id})}"
+                                   class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                                    <span th:text="${qna.isAnswered ? '보기' : '답변'}">답변</span>
+                                </a>
+                                <form th:action="@{/admin/qnas/{id}/toggle-hidden(id=${qna.id})}"
+                                      method="post" style="display: inline;">
+                                    <button type="submit" class="btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;"
+                                            th:text="${qna.isHidden ? '공개' : '숨김'}">숨김</button>
+                                </form>
+                                <form th:action="@{/admin/qnas/{id}/delete(id=${qna.id})}"
+                                      method="post" style="display: inline;"
+                                      onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                                    <button type="submit" class="btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;">삭제</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script th:src="@{/js/admin.js}"></script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(speckit.constitution)",
+      "Bash(git fetch:*)",
+      "Bash(ls:*)",
+      "Bash(powershell.exe:*)",
+      "Bash(test:*)",
+      "Bash(cat:*)",
+      "Bash(./gradlew clean build:*)",
+      "Bash(findstr:*)",
+      "Bash(dir:*)",
+      "Bash(./gradlew clean:*)",
+      "Bash(./gradlew compileJava:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(./gradlew build:*)",
+      "Bash(./gradlew test:*)",
+      "Bash(./gradlew bootRun)",
+      "Bash(.gradlew clean build)",
+      "Bash(gradlew.bat clean build)",
+      "Bash(gradlew.bat build:*)",
+      "Bash(gradlew.bat clean build:*)",
+      "Bash(./gradlew:*)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "Bash(timeout 20 ./gradlew:*)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)",
+      "Bash(powershell -Command \"Stop-Process -Id 25256 -Force\")",
+      "Bash(powershell -Command \"Get-Process -Id \\(Get-NetTCPConnection -LocalPort 8080 -State Listen -ErrorAction SilentlyContinue\\).OwningProcess -ErrorAction SilentlyContinue | Stop-Process -Force\")",
+      "Bash(.gradlew.bat bootRun)",
+      "Bash(timeout /t 10)"
+    ]
+  }
+}

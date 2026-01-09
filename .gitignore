@@ -35,3 +35,33 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Java ###
+*.class
+*.log
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+### Spring Boot ###
+target/
+*.log
+application-local.yaml
+
+### Environment ###
+.env
+.env.*
+!.env.example
+
+### File Uploads ###
+bear-uploads/
+
+### OS ###
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
