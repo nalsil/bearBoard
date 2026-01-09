@@ -37,7 +37,7 @@
         </div>
 
         <!-- 성공 메시지 -->
-        <div class="alert alert-success" th:if="${param.success}">
+        <div class="alert alert-success" th:if="${param.success != null and !#lists.isEmpty(param.success)}">
             <span th:if="${param.success[0] == 'created'}">FAQ가 등록되었습니다.</span>
             <span th:if="${param.success[0] == 'updated'}">FAQ가 수정되었습니다.</span>
             <span th:if="${param.success[0] == 'deleted'}">FAQ가 삭제되었습니다.</span>

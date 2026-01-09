@@ -66,11 +66,11 @@ public class AdminDashboardController {
                     model.addAttribute("company", company);
                     model.addAttribute("isSuperAdmin", isSuperAdmin);
 
-                    // 통계 데이터 수집
+                    // 통계 데이터 수집 (관리자용 - 숨김 포함)
                     Mono<Long> totalPosts = postService.countPostsByCompanyId(adminCompanyId);
-                    Mono<Long> totalFaqs = faqService.getFaqsByCompanyId(adminCompanyId).count();
+                    Mono<Long> totalFaqs = faqService.getAllFaqsByCompanyId(adminCompanyId).count();
                     Mono<Long> unansweredQnas = qnaService.getQnasByAnswerStatus(adminCompanyId, false, 0, Integer.MAX_VALUE).count();
-                    Mono<Long> totalYoutubeVideos = youtubeVideoService.getVideosByCompanyId(adminCompanyId).count();
+                    Mono<Long> totalYoutubeVideos = youtubeVideoService.getAllVideosByCompanyId(adminCompanyId).count();
                     Mono<Long> totalProducts = productService.getProductsByCompanyId(adminCompanyId).count();
 
                     return Mono.zip(totalPosts, totalFaqs, unansweredQnas, totalYoutubeVideos, totalProducts)

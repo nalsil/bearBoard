@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${post.id != null ? '게시글 수정' : '게시글 작성'}">게시글 작성</title>
+    <title th:text="${isEdit ? '게시글 수정' : '게시글 작성'}">게시글 작성</title>
     <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
 <body>
     <!-- 헤더 -->
     <header class="admin-header">
         <div class="admin-header-content">
-            <h1 th:text="${post.id != null ? '게시글 수정' : '게시글 작성'}">게시글 작성</h1>
+            <h1 th:text="${isEdit ? '게시글 수정' : '게시글 작성'}">게시글 작성</h1>
             <div class="admin-user-info">
                 <span th:text="${board != null ? board.name : '게시판'}">게시판명</span>
                 <a th:href="@{/admin/logout}" class="btn-logout">로그아웃</a>
@@ -34,8 +34,8 @@
     <main class="admin-main">
         <div class="form-container">
             <form method="post"
-                  th:action="${post.id != null ?
-                             '/admin/boards/' + board.id + '/posts/' + post.id :
+                  th:action="${isEdit ?
+                             '/admin/boards/' + board.id + '/posts/' + postId :
                              '/admin/boards/' + board.id + '/posts'}"
                   th:object="${post}">
 

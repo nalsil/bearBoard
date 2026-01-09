@@ -39,7 +39,7 @@ public class AdminFaqController {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
         log.info("관리자 FAQ 목록 조회: companyId={}", adminCompanyId);
 
-        return faqService.getFaqsByCompanyId(adminCompanyId)
+        return faqService.getAllFaqsByCompanyId(adminCompanyId)
                 .collectList()
                 .doOnNext(faqs -> {
                     model.addAttribute("faqs", faqs);

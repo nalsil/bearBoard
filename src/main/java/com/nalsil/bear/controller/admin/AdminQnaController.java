@@ -39,7 +39,7 @@ public class AdminQnaController {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
         log.info("관리자 QnA 목록 조회: companyId={}", adminCompanyId);
 
-        return qnaService.getQnasByCompanyId(adminCompanyId, 0, 100)
+        return qnaService.getAllQnasByCompanyId(adminCompanyId, 0, 100)
                 .collectList()
                 .doOnNext(qnas -> model.addAttribute("qnas", qnas))
                 .thenReturn("admin/qna/list");

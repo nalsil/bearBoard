@@ -41,6 +41,9 @@ dependencies {
 	// MapStruct
 	implementation 'org.mapstruct:mapstruct:1.6.3'
 
+	// R2DBC 디버깅
+	//	implementation 'io.r2dbc:r2dbc-proxy:1.1.6.RELEASE'
+
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'org.postgresql:postgresql'

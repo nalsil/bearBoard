@@ -33,7 +33,7 @@
     <main class="admin-main">
         <div class="form-container">
             <!-- 에러 메시지 -->
-            <div class="alert alert-error" th:if="${param.error}">
+            <div class="alert alert-error" th:if="${param.error != null and !#lists.isEmpty(param.error)}">
                 <span th:if="${param.error[0] == 'invalid_url'}">유효하지 않은 유튜브 URL입니다. youtube.com 또는 youtu.be 링크를 입력하세요.</span>
             </div>
 

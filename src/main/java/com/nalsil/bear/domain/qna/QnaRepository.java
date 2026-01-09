@@ -59,4 +59,13 @@ public interface QnaRepository extends R2dbcRepository<Qna, Long> {
      * @return QnA 개수 (Mono<Long>)
      */
     Mono<Long> countByCompanyIdAndIsAnswered(Long companyId, Boolean isAnswered);
+
+    /**
+     * 기업 ID로 모든 QnA 목록 조회 (관리자용, 숨김 포함, 최신순)
+     *
+     * @param companyId 기업 ID
+     * @param pageable 페이징 정보
+     * @return QnA 목록 (Flux)
+     */
+    Flux<Qna> findByCompanyIdOrderByCreatedAtDesc(Long companyId, Pageable pageable);
 }

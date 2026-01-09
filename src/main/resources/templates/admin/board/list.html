@@ -38,7 +38,7 @@
         </div>
 
         <!-- 성공 메시지 -->
-        <div class="alert alert-success" th:if="${param.success}">
+        <div class="alert alert-success" th:if="${param.success != null and !#lists.isEmpty(param.success)}">
             <span th:if="${param.success[0] == 'created'}">게시글이 등록되었습니다.</span>
             <span th:if="${param.success[0] == 'updated'}">게시글이 수정되었습니다.</span>
             <span th:if="${param.success[0] == 'deleted'}">게시글이 삭제되었습니다.</span>

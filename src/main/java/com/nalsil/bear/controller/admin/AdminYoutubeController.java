@@ -39,7 +39,7 @@ public class AdminYoutubeController {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
         log.info("관리자 유튜브 영상 목록 조회: companyId={}", adminCompanyId);
 
-        return youtubeVideoService.getVideosByCompanyId(adminCompanyId)
+        return youtubeVideoService.getAllVideosByCompanyId(adminCompanyId)
                 .collectList()
                 .doOnNext(videos -> model.addAttribute("videos", videos))
                 .thenReturn("admin/youtube/list");

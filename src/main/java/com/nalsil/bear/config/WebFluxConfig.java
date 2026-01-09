@@ -1,14 +1,10 @@
 package com.nalsil.bear.config;
 
-import com.nalsil.bear.filter.JwtAuthenticationFilter;
-import com.nalsil.bear.filter.TenantFilter;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.config.CorsRegistry;
 import org.springframework.web.reactive.config.ResourceHandlerRegistry;
 import org.springframework.web.reactive.config.ViewResolverRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
-import org.springframework.web.server.WebFilter;
 import org.thymeleaf.spring6.view.reactive.ThymeleafReactiveViewResolver;
 
 /**

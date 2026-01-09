@@ -69,3 +69,5 @@ logging:
     org.springframework.web: DEBUG
     org.springframework.web.server: TRACE
     reactor.netty: DEBUG
+    io.r2dbc.postgresql: DEBUG        # 사용하는 DB 드라이버 로그 (PostgreSQL 예시)
+

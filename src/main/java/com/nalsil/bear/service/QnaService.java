@@ -108,6 +108,20 @@ public class QnaService {
     }
 
     /**
+     * 기업별 모든 QnA 목록 조회 (관리자용, 숨김 포함)
+     *
+     * @param companyId 기업 ID
+     * @param page 페이지 번호
+     * @param size 페이지 크기
+     * @return QnA 목록
+     */
+    public Flux<Qna> getAllQnasByCompanyId(Long companyId, int page, int size) {
+        log.debug("기업 ID로 모든 QnA 목록 조회 (관리자용): companyId={}, page={}, size={}", companyId, page, size);
+        Pageable pageable = PageRequest.of(page, size);
+        return qnaRepository.findByCompanyIdOrderByCreatedAtDesc(companyId, pageable);
+    }
+
+    /**
      * QnA 수정
      *
      * @param qna QnA 엔티티

@@ -29,7 +29,13 @@
       "Bash(powershell -Command \"Stop-Process -Id 25256 -Force\")",
       "Bash(powershell -Command \"Get-Process -Id \\(Get-NetTCPConnection -LocalPort 8080 -State Listen -ErrorAction SilentlyContinue\\).OwningProcess -ErrorAction SilentlyContinue | Stop-Process -Force\")",
       "Bash(.gradlew.bat bootRun)",
-      "Bash(timeout /t 10)"
+      "Bash(timeout /t 10)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_type",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_press_key",
+      "mcp__playwright__browser_wait_for"
     ]
   }
 }

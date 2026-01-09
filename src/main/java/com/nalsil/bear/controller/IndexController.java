@@ -3,8 +3,11 @@ package com.nalsil.bear.controller;
 import com.nalsil.bear.service.CompanyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.reactive.result.view.Rendering;
 import reactor.core.publisher.Mono;
 
@@ -34,5 +37,13 @@ public class IndexController {
                 .map(companies -> Rendering.view("index")
                         .modelAttribute("companies", companies)
                         .build());
+    }
+
+
+    @GetMapping(value = "/favicon.ico", produces = "image/x-icon")
+    @ResponseBody
+    public Mono<Resource> favicon() {
+        // src/main/resources/static/favicon.ico 파일을 반환합니다.
+        return Mono.just(new ClassPathResource("static/favicon.ico"));
     }
 }

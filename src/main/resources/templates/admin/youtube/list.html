@@ -37,14 +37,14 @@
         </div>
 
         <!-- 성공 메시지 -->
-        <div class="alert alert-success" th:if="${param.success}">
+        <div class="alert alert-success" th:if="${param.success != null and !#lists.isEmpty(param.success)}">
             <span th:if="${param.success[0] == 'created'}">영상이 등록되었습니다.</span>
             <span th:if="${param.success[0] == 'updated'}">영상이 수정되었습니다.</span>
             <span th:if="${param.success[0] == 'deleted'}">영상이 삭제되었습니다.</span>
         </div>
 
         <!-- 에러 메시지 -->
-        <div class="alert alert-error" th:if="${param.error}">
+        <div class="alert alert-error" th:if="${param.error != null and !#lists.isEmpty(param.error)}">
             <span th:if="${param.error[0] == 'invalid_url'}">유효하지 않은 유튜브 URL입니다.</span>
         </div>
 

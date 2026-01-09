@@ -96,6 +96,7 @@ public class AdminBoardController {
 
                     model.addAttribute("board", board);
                     model.addAttribute("post", new CreatePostRequest());
+                    model.addAttribute("isEdit", false);
                     return Mono.just("admin/board/form");
                 })
                 .onErrorResume(IllegalAccessException.class, e -> {
@@ -171,6 +172,8 @@ public class AdminBoardController {
 
                     model.addAttribute("board", board);
                     model.addAttribute("post", post);
+                    model.addAttribute("isEdit", true);
+                    model.addAttribute("postId", postId);
                     return Mono.just("admin/board/form");
                 })
                 .onErrorResume(IllegalAccessException.class, e -> {

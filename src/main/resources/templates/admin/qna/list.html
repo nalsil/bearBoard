@@ -36,7 +36,7 @@
         </div>
 
         <!-- 성공 메시지 -->
-        <div class="alert alert-success" th:if="${param.success}">
+        <div class="alert alert-success" th:if="${param.success != null and !#lists.isEmpty(param.success)}">
             <span th:if="${param.success[0] == 'answered'}">답변이 등록되었습니다.</span>
             <span th:if="${param.success[0] == 'deleted'}">QnA가 삭제되었습니다.</span>
         </div>

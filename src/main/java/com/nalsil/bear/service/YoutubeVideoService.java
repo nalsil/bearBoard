@@ -109,6 +109,17 @@ public class YoutubeVideoService {
     }
 
     /**
+     * 기업별 모든 유튜브 영상 목록 조회 (관리자용, 숨김 포함)
+     *
+     * @param companyId 기업 ID
+     * @return 유튜브 영상 목록
+     */
+    public Flux<YoutubeVideo> getAllVideosByCompanyId(Long companyId) {
+        log.debug("기업 ID로 모든 유튜브 영상 목록 조회 (관리자용): companyId={}", companyId);
+        return youtubeVideoRepository.findByCompanyIdOrderByDisplayOrderAsc(companyId);
+    }
+
+    /**
      * 유튜브 영상 생성
      *
      * @param video 유튜브 영상 엔티티

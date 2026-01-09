@@ -84,6 +84,17 @@ public class FaqService {
     }
 
     /**
+     * 기업별 모든 FAQ 목록 조회 (관리자용, 숨김 포함)
+     *
+     * @param companyId 기업 ID
+     * @return FAQ 목록
+     */
+    public Flux<Faq> getAllFaqsByCompanyId(Long companyId) {
+        log.debug("기업 ID로 모든 FAQ 목록 조회 (관리자용): companyId={}", companyId);
+        return faqRepository.findByCompanyIdOrderByDisplayOrderAsc(companyId);
+    }
+
+    /**
      * FAQ 생성
      *
      * @param faq FAQ 엔티티
