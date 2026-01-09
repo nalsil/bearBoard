@@ -3,6 +3,7 @@ package com.nalsil.bear.controller.admin;
 import com.nalsil.bear.domain.product.Product;
 import com.nalsil.bear.mapper.ProductMapper;
 import com.nalsil.bear.service.AdminService;
+import com.nalsil.bear.service.CompanyService;
 import com.nalsil.bear.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ public class AdminProductController {
     private final ProductService productService;
     private final AdminService adminService;
     private final ProductMapper productMapper;
+    private final CompanyService companyService;
 
     /**
      * 상품 목록
@@ -39,9 +41,14 @@ public class AdminProductController {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
         log.info("관리자 상품 목록 조회: companyId={}", adminCompanyId);
 
-        return productService.getProductsByCompanyId(adminCompanyId)
-                .collectList()
-                .doOnNext(products -> model.addAttribute("products", products))
+        return companyService.getCompanyById(adminCompanyId)
+                .flatMap(company -> {
+                    model.addAttribute("company", company);
+
+                    return productService.getProductsByCompanyId(adminCompanyId)
+                            .collectList()
+                            .doOnNext(products -> model.addAttribute("products", products));
+                })
                 .thenReturn("admin/product/list");
     }
 
@@ -54,8 +61,14 @@ public class AdminProductController {
      */
     @GetMapping("/new")
     public Mono<String> newProductForm(ServerWebExchange exchange, Model model) {
-        model.addAttribute("product", new Product());
-        return Mono.just("admin/product/form");
+        Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
+
+        return companyService.getCompanyById(adminCompanyId)
+                .doOnNext(company -> {
+                    model.addAttribute("company", company);
+                    model.addAttribute("product", new Product());
+                })
+                .thenReturn("admin/product/form");
     }
 
     /**
@@ -95,15 +108,20 @@ public class AdminProductController {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
         log.info("상품 수정 폼: id={}", id);
 
-        return productService.getProductById(id)
-                .flatMap(product -> {
-                    // 권한 확인
-                    if (!product.getCompanyId().equals(adminCompanyId)) {
-                        return Mono.error(new IllegalAccessException("접근 권한이 없습니다."));
-                    }
+        return companyService.getCompanyById(adminCompanyId)
+                .flatMap(company -> {
+                    model.addAttribute("company", company);
 
-                    model.addAttribute("product", product);
-                    return Mono.just("admin/product/form");
+                    return productService.getProductById(id)
+                            .flatMap(product -> {
+                                // 권한 확인
+                                if (!product.getCompanyId().equals(adminCompanyId)) {
+                                    return Mono.error(new IllegalAccessException("접근 권한이 없습니다."));
+                                }
+
+                                model.addAttribute("product", product);
+                                return Mono.just("admin/product/form");
+                            });
                 })
                 .onErrorResume(IllegalAccessException.class, e -> {
                     return Mono.just("redirect:/admin/products?error=access_denied");

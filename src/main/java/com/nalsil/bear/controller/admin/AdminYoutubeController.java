@@ -3,6 +3,7 @@ package com.nalsil.bear.controller.admin;
 import com.nalsil.bear.domain.youtube.YoutubeVideo;
 import com.nalsil.bear.mapper.YoutubeVideoMapper;
 import com.nalsil.bear.service.AdminService;
+import com.nalsil.bear.service.CompanyService;
 import com.nalsil.bear.service.YoutubeVideoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ public class AdminYoutubeController {
     private final YoutubeVideoService youtubeVideoService;
     private final AdminService adminService;
     private final YoutubeVideoMapper youtubeVideoMapper;
+    private final CompanyService companyService;
 
     /**
      * 유튜브 영상 목록
@@ -39,9 +41,14 @@ public class AdminYoutubeController {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
         log.info("관리자 유튜브 영상 목록 조회: companyId={}", adminCompanyId);
 
-        return youtubeVideoService.getAllVideosByCompanyId(adminCompanyId)
-                .collectList()
-                .doOnNext(videos -> model.addAttribute("videos", videos))
+        return companyService.getCompanyById(adminCompanyId)
+                .flatMap(company -> {
+                    model.addAttribute("company", company);
+
+                    return youtubeVideoService.getAllVideosByCompanyId(adminCompanyId)
+                            .collectList()
+                            .doOnNext(videos -> model.addAttribute("videos", videos));
+                })
                 .thenReturn("admin/youtube/list");
     }
 
@@ -54,8 +61,14 @@ public class AdminYoutubeController {
      */
     @GetMapping("/new")
     public Mono<String> newVideoForm(ServerWebExchange exchange, Model model) {
-        model.addAttribute("video", new YoutubeVideo());
-        return Mono.just("admin/youtube/form");
+        Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
+
+        return companyService.getCompanyById(adminCompanyId)
+                .doOnNext(company -> {
+                    model.addAttribute("company", company);
+                    model.addAttribute("video", new YoutubeVideo());
+                })
+                .thenReturn("admin/youtube/form");
     }
 
     /**
@@ -104,15 +117,20 @@ public class AdminYoutubeController {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
         log.info("유튜브 영상 수정 폼: id={}", id);
 
-        return youtubeVideoService.getVideoById(id)
-                .flatMap(video -> {
-                    // 권한 확인
-                    if (!video.getCompanyId().equals(adminCompanyId)) {
-                        return Mono.error(new IllegalAccessException("접근 권한이 없습니다."));
-                    }
+        return companyService.getCompanyById(adminCompanyId)
+                .flatMap(company -> {
+                    model.addAttribute("company", company);
 
-                    model.addAttribute("video", video);
-                    return Mono.just("admin/youtube/form");
+                    return youtubeVideoService.getVideoById(id)
+                            .flatMap(video -> {
+                                // 권한 확인
+                                if (!video.getCompanyId().equals(adminCompanyId)) {
+                                    return Mono.error(new IllegalAccessException("접근 권한이 없습니다."));
+                                }
+
+                                model.addAttribute("video", video);
+                                return Mono.just("admin/youtube/form");
+                            });
                 })
                 .onErrorResume(IllegalAccessException.class, e -> {
                     return Mono.just("redirect:/admin/youtube?error=access_denied");

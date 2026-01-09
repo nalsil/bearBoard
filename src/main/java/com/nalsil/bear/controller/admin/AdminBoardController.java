@@ -5,6 +5,7 @@ import com.nalsil.bear.domain.post.Post;
 import com.nalsil.bear.mapper.PostMapper;
 import com.nalsil.bear.service.AdminService;
 import com.nalsil.bear.service.BoardService;
+import com.nalsil.bear.service.CompanyService;
 import com.nalsil.bear.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,27 @@ public class AdminBoardController {
     private final BoardService boardService;
     private final PostService postService;
     private final AdminService adminService;
+    private final CompanyService companyService;
     private final PostMapper postMapper;
+
+    /**
+     * 게시판 목록 조회 (리다이렉트)
+     *
+     * 해당 회사의 첫 번째 게시판으로 리다이렉트
+     *
+     * @param exchange ServerWebExchange
+     * @return 첫 번째 게시판의 게시글 목록으로 리다이렉트
+     */
+    @GetMapping
+    public Mono<String> redirectToFirstBoard(ServerWebExchange exchange) {
+        Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
+        log.info("게시판 목록 조회 요청: companyId={}", adminCompanyId);
+
+        return boardService.getBoardsByCompanyId(adminCompanyId)
+                .next() // 첫 번째 게시판 가져오기
+                .map(board -> "redirect:/admin/boards/" + board.getId() + "/posts")
+                .defaultIfEmpty("redirect:/admin/dashboard?error=no_boards");
+    }
 
     /**
      * 게시판 목록
@@ -49,19 +70,24 @@ public class AdminBoardController {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
         log.info("관리자 게시글 목록 조회: boardId={}, companyId={}", boardId, adminCompanyId);
 
-        return boardService.getBoardById(boardId)
-                .flatMap(board -> {
-                    // 권한 확인
-                    if (!board.getCompanyId().equals(adminCompanyId)) {
-                        return Mono.error(new IllegalAccessException("접근 권한이 없습니다."));
-                    }
+        return companyService.getCompanyById(adminCompanyId)
+                .flatMap(company -> {
+                    model.addAttribute("company", company);
 
-                    model.addAttribute("board", board);
+                    return boardService.getBoardById(boardId)
+                            .flatMap(board -> {
+                                // 권한 확인
+                                if (!board.getCompanyId().equals(adminCompanyId)) {
+                                    return Mono.error(new IllegalAccessException("접근 권한이 없습니다."));
+                                }
 
-                    // 숨김 포함 전체 게시글 조회 (관리자용)
-                    return postService.getPostsByBoardIdIncludingHidden(boardId, 0, 100)
-                            .collectList()
-                            .doOnNext(posts -> model.addAttribute("posts", posts));
+                                model.addAttribute("board", board);
+
+                                // 숨김 포함 전체 게시글 조회 (관리자용)
+                                return postService.getPostsByBoardIdIncludingHidden(boardId, 0, 100)
+                                        .collectList()
+                                        .doOnNext(posts -> model.addAttribute("posts", posts));
+                            });
                 })
                 .thenReturn("admin/board/list")
                 .onErrorResume(IllegalAccessException.class, e -> {
@@ -87,17 +113,22 @@ public class AdminBoardController {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
         log.info("게시글 작성 폼: boardId={}, companyId={}", boardId, adminCompanyId);
 
-        return boardService.getBoardById(boardId)
-                .flatMap(board -> {
-                    // 권한 확인
-                    if (!board.getCompanyId().equals(adminCompanyId)) {
-                        return Mono.error(new IllegalAccessException("접근 권한이 없습니다."));
-                    }
+        return companyService.getCompanyById(adminCompanyId)
+                .flatMap(company -> {
+                    model.addAttribute("company", company);
 
-                    model.addAttribute("board", board);
-                    model.addAttribute("post", new CreatePostRequest());
-                    model.addAttribute("isEdit", false);
-                    return Mono.just("admin/board/form");
+                    return boardService.getBoardById(boardId)
+                            .flatMap(board -> {
+                                // 권한 확인
+                                if (!board.getCompanyId().equals(adminCompanyId)) {
+                                    return Mono.error(new IllegalAccessException("접근 권한이 없습니다."));
+                                }
+
+                                model.addAttribute("board", board);
+                                model.addAttribute("post", new CreatePostRequest());
+                                model.addAttribute("isEdit", false);
+                                return Mono.just("admin/board/form");
+                            });
                 })
                 .onErrorResume(IllegalAccessException.class, e -> {
                     return Mono.just("redirect:/admin/dashboard?error=access_denied");
@@ -159,22 +190,27 @@ public class AdminBoardController {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
         log.info("게시글 수정 폼: boardId={}, postId={}", boardId, postId);
 
-        return boardService.getBoardById(boardId)
-                .zipWith(postService.getPostById(postId))
-                .flatMap(tuple -> {
-                    var board = tuple.getT1();
-                    var post = tuple.getT2();
+        return companyService.getCompanyById(adminCompanyId)
+                .flatMap(company -> {
+                    model.addAttribute("company", company);
 
-                    // 권한 확인
-                    if (!board.getCompanyId().equals(adminCompanyId)) {
-                        return Mono.error(new IllegalAccessException("접근 권한이 없습니다."));
-                    }
+                    return boardService.getBoardById(boardId)
+                            .zipWith(postService.getPostById(postId))
+                            .flatMap(tuple -> {
+                                var board = tuple.getT1();
+                                var post = tuple.getT2();
 
-                    model.addAttribute("board", board);
-                    model.addAttribute("post", post);
-                    model.addAttribute("isEdit", true);
-                    model.addAttribute("postId", postId);
-                    return Mono.just("admin/board/form");
+                                // 권한 확인
+                                if (!board.getCompanyId().equals(adminCompanyId)) {
+                                    return Mono.error(new IllegalAccessException("접근 권한이 없습니다."));
+                                }
+
+                                model.addAttribute("board", board);
+                                model.addAttribute("post", post);
+                                model.addAttribute("isEdit", true);
+                                model.addAttribute("postId", postId);
+                                return Mono.just("admin/board/form");
+                            });
                 })
                 .onErrorResume(IllegalAccessException.class, e -> {
                     return Mono.just("redirect:/admin/dashboard?error=access_denied");

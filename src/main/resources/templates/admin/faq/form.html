@@ -12,6 +12,7 @@
         <div class="admin-header-content">
             <h1 th:text="${faq.id != null ? 'FAQ 수정' : 'FAQ 등록'}">FAQ 등록</h1>
             <div class="admin-user-info">
+                <span th:text="${company != null ? company.name : '회사명'}">회사명</span>
                 <a th:href="@{/admin/logout}" class="btn-logout">로그아웃</a>
             </div>
         </div>
@@ -21,7 +22,7 @@
     <aside class="admin-sidebar">
         <nav class="admin-nav">
             <a th:href="@{/admin/dashboard}" class="nav-item">대시보드</a>
-            <a th:href="@{/admin/boards/1/posts}" class="nav-item">게시판 관리</a>
+            <a th:href="@{/admin/boards}" class="nav-item">게시판 관리</a>
             <a th:href="@{/admin/faqs}" class="nav-item active">FAQ 관리</a>
             <a th:href="@{/admin/qnas}" class="nav-item">QnA 관리</a>
             <a th:href="@{/admin/youtube}" class="nav-item">영상 관리</a>

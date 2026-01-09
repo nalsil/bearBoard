@@ -3,6 +3,7 @@ package com.nalsil.bear.controller.admin;
 import com.nalsil.bear.domain.faq.Faq;
 import com.nalsil.bear.mapper.FaqMapper;
 import com.nalsil.bear.service.AdminService;
+import com.nalsil.bear.service.CompanyService;
 import com.nalsil.bear.service.FaqService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ public class AdminFaqController {
     private final FaqService faqService;
     private final AdminService adminService;
     private final FaqMapper faqMapper;
+    private final CompanyService companyService;
 
     /**
      * FAQ 목록
@@ -39,15 +41,20 @@ public class AdminFaqController {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
         log.info("관리자 FAQ 목록 조회: companyId={}", adminCompanyId);
 
-        return faqService.getAllFaqsByCompanyId(adminCompanyId)
-                .collectList()
-                .doOnNext(faqs -> {
-                    model.addAttribute("faqs", faqs);
-                    // 카테고리 목록도 전달
-                    faqService.getCategoriesByCompanyId(adminCompanyId)
+        return companyService.getCompanyById(adminCompanyId)
+                .flatMap(company -> {
+                    model.addAttribute("company", company);
+
+                    return faqService.getAllFaqsByCompanyId(adminCompanyId)
                             .collectList()
-                            .doOnNext(categories -> model.addAttribute("categories", categories))
-                            .subscribe();
+                            .doOnNext(faqs -> {
+                                model.addAttribute("faqs", faqs);
+                                // 카테고리 목록도 전달
+                                faqService.getCategoriesByCompanyId(adminCompanyId)
+                                        .collectList()
+                                        .doOnNext(categories -> model.addAttribute("categories", categories))
+                                        .subscribe();
+                            });
                 })
                 .thenReturn("admin/faq/list");
     }
@@ -61,8 +68,14 @@ public class AdminFaqController {
      */
     @GetMapping("/new")
     public Mono<String> newFaqForm(ServerWebExchange exchange, Model model) {
-        model.addAttribute("faq", new Faq());
-        return Mono.just("admin/faq/form");
+        Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
+
+        return companyService.getCompanyById(adminCompanyId)
+                .doOnNext(company -> {
+                    model.addAttribute("company", company);
+                    model.addAttribute("faq", new Faq());
+                })
+                .thenReturn("admin/faq/form");
     }
 
     /**
@@ -102,15 +115,20 @@ public class AdminFaqController {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
         log.info("FAQ 수정 폼: id={}", id);
 
-        return faqService.getFaqById(id)
-                .flatMap(faq -> {
-                    // 권한 확인
-                    if (!faq.getCompanyId().equals(adminCompanyId)) {
-                        return Mono.error(new IllegalAccessException("접근 권한이 없습니다."));
-                    }
+        return companyService.getCompanyById(adminCompanyId)
+                .flatMap(company -> {
+                    model.addAttribute("company", company);
 
-                    model.addAttribute("faq", faq);
-                    return Mono.just("admin/faq/form");
+                    return faqService.getFaqById(id)
+                            .flatMap(faq -> {
+                                // 권한 확인
+                                if (!faq.getCompanyId().equals(adminCompanyId)) {
+                                    return Mono.error(new IllegalAccessException("접근 권한이 없습니다."));
+                                }
+
+                                model.addAttribute("faq", faq);
+                                return Mono.just("admin/faq/form");
+                            });
                 })
                 .onErrorResume(IllegalAccessException.class, e -> {
                     return Mono.just("redirect:/admin/faqs?error=access_denied");

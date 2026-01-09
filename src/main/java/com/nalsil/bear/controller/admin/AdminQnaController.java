@@ -3,6 +3,7 @@ package com.nalsil.bear.controller.admin;
 import com.nalsil.bear.domain.qna.Qna;
 import com.nalsil.bear.mapper.QnaMapper;
 import com.nalsil.bear.service.AdminService;
+import com.nalsil.bear.service.CompanyService;
 import com.nalsil.bear.service.QnaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ public class AdminQnaController {
     private final QnaService qnaService;
     private final AdminService adminService;
     private final QnaMapper qnaMapper;
+    private final CompanyService companyService;
 
     /**
      * QnA 목록
@@ -39,9 +41,14 @@ public class AdminQnaController {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
         log.info("관리자 QnA 목록 조회: companyId={}", adminCompanyId);
 
-        return qnaService.getAllQnasByCompanyId(adminCompanyId, 0, 100)
-                .collectList()
-                .doOnNext(qnas -> model.addAttribute("qnas", qnas))
+        return companyService.getCompanyById(adminCompanyId)
+                .flatMap(company -> {
+                    model.addAttribute("company", company);
+
+                    return qnaService.getAllQnasByCompanyId(adminCompanyId, 0, 100)
+                            .collectList()
+                            .doOnNext(qnas -> model.addAttribute("qnas", qnas));
+                })
                 .thenReturn("admin/qna/list");
     }
 
@@ -62,15 +69,20 @@ public class AdminQnaController {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
         log.info("QnA 상세 조회: id={}", id);
 
-        return qnaService.getQnaById(id)
-                .flatMap(qna -> {
-                    // 권한 확인
-                    if (!qna.getCompanyId().equals(adminCompanyId)) {
-                        return Mono.error(new IllegalAccessException("접근 권한이 없습니다."));
-                    }
+        return companyService.getCompanyById(adminCompanyId)
+                .flatMap(company -> {
+                    model.addAttribute("company", company);
 
-                    model.addAttribute("qna", qna);
-                    return Mono.just("admin/qna/detail");
+                    return qnaService.getQnaById(id)
+                            .flatMap(qna -> {
+                                // 권한 확인
+                                if (!qna.getCompanyId().equals(adminCompanyId)) {
+                                    return Mono.error(new IllegalAccessException("접근 권한이 없습니다."));
+                                }
+
+                                model.addAttribute("qna", qna);
+                                return Mono.just("admin/qna/detail");
+                            });
                 })
                 .onErrorResume(IllegalAccessException.class, e -> {
                     return Mono.just("redirect:/admin/qnas?error=access_denied");
