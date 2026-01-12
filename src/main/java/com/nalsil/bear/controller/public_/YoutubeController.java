@@ -2,6 +2,9 @@ package com.nalsil.bear.controller.public_;
 
 import com.nalsil.bear.service.CompanyService;
 import com.nalsil.bear.service.YoutubeVideoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -16,6 +19,7 @@ import reactor.core.publisher.Mono;
  *
  * 유튜브 영상 목록 조회 및 재생 기능을 제공합니다.
  */
+@Tag(name = "공개 페이지 - 유튜브", description = "기업 공개 유튜브 영상 목록 및 상세 API")
 @Slf4j
 @Controller
 @RequestMapping("/{companyCode}/youtube")
@@ -32,6 +36,7 @@ public class YoutubeController {
      * @param model 모델
      * @return 유튜브 영상 목록 템플릿
      */
+    @Operation(summary = "유튜브 영상 목록 조회", description = "기업의 유튜브 영상 목록을 조회합니다.", tags = "공개 페이지 - 유튜브")
     @GetMapping
     public Mono<String> list(
             @PathVariable String companyCode,
@@ -59,6 +64,7 @@ public class YoutubeController {
      * @param model 모델
      * @return 유튜브 영상 재생 템플릿
      */
+    @Operation(summary = "유튜브 영상 재생", description = "특정 유튜브 영상을 재생합니다.", tags = "공개 페이지 - 유튜브")
     @GetMapping("/{id}")
     public Mono<String> player(
             @PathVariable String companyCode,

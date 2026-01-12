@@ -2,6 +2,13 @@ package com.nalsil.bear.controller.admin;
 
 import com.nalsil.bear.service.AdminService;
 import com.nalsil.bear.util.JwtUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseCookie;
@@ -16,6 +23,7 @@ import reactor.core.publisher.Mono;
  *
  * 관리자 로그인, 로그아웃 기능을 제공합니다.
  */
+@Tag(name = "관리자 인증", description = "관리자 로그인 및 로그아웃 API")
 @Slf4j
 @Controller
 @RequestMapping("/admin")
@@ -31,6 +39,14 @@ public class AdminLoginController {
      * @param model 모델
      * @return 로그인 템플릿
      */
+    @Operation(
+            summary = "관리자 로그인 페이지",
+            description = "관리자 로그인 화면을 표시합니다.",
+            tags = "관리자 인증"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "로그인 페이지 조회 성공")
+    })
     @GetMapping("/login")
     public Mono<String> loginPage(Model model) {
         log.info("관리자 로그인 페이지 접근");
@@ -45,6 +61,24 @@ public class AdminLoginController {
      * @param model 모델
      * @return 로그인 성공 시 대시보드로 리다이렉트, 실패 시 로그인 페이지
      */
+    @Operation(
+            summary = "관리자 로그인 처리",
+            description = """
+                    관리자 계정으로 로그인합니다.
+
+                    성공 시 JWT 토큰을 HTTP-only 쿠키에 저장하고 대시보드로 리다이렉트합니다.
+                    실패 시 로그인 페이지로 돌아갑니다.
+
+                    **Form Data:**
+                    - username: 관리자 아이디
+                    - password: 비밀번호
+                    """,
+            tags = "관리자 인증"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "302", description = "로그인 성공, 대시보드로 리다이렉트"),
+            @ApiResponse(responseCode = "200", description = "로그인 실패, 로그인 페이지 재표시")
+    })
     @PostMapping("/login")
     public Mono<String> login(ServerWebExchange exchange) {
         log.error("========== !!! 관리자 로그인 POST 요청 도달!!! ==========");
@@ -112,6 +146,14 @@ public class AdminLoginController {
      * @param exchange ServerWebExchange
      * @return 로그인 페이지로 리다이렉트
      */
+    @Operation(
+            summary = "관리자 로그아웃",
+            description = "관리자 로그아웃을 처리합니다. JWT 토큰 쿠키를 삭제하고 로그인 페이지로 리다이렉트합니다.",
+            tags = "관리자 인증"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "302", description = "로그아웃 성공, 로그인 페이지로 리다이렉트")
+    })
     @GetMapping("/logout")
     public Mono<String> logout(ServerWebExchange exchange) {
         log.info("관리자 로그아웃");

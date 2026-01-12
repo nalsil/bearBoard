@@ -7,6 +7,9 @@ import com.nalsil.bear.service.AdminService;
 import com.nalsil.bear.service.BoardService;
 import com.nalsil.bear.service.CompanyService;
 import com.nalsil.bear.service.PostService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -22,10 +25,12 @@ import java.time.LocalDateTime;
  *
  * 관리자가 게시글을 등록, 수정, 삭제, 숨김 처리할 수 있습니다.
  */
+@Tag(name = "관리자 - 게시판 관리", description = "관리자 게시글 등록, 수정, 삭제, 숨김 처리 API")
 @Slf4j
 @Controller
 @RequestMapping("/admin/boards")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "JWT Cookie")
 public class AdminBoardController {
 
     private final BoardService boardService;
@@ -42,6 +47,7 @@ public class AdminBoardController {
      * @param exchange ServerWebExchange
      * @return 첫 번째 게시판의 게시글 목록으로 리다이렉트
      */
+    @Operation(summary = "첫 번째 게시판으로 리다이렉트", description = "회사의 첫 번째 게시판 목록으로 리다이렉트합니다.", tags = "관리자 - 게시판 관리")
     @GetMapping
     public Mono<String> redirectToFirstBoard(ServerWebExchange exchange) {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
@@ -61,6 +67,7 @@ public class AdminBoardController {
      * @param model 모델
      * @return 게시글 목록 템플릿
      */
+    @Operation(summary = "게시판 게시글 목록 조회", description = "특정 게시판의 게시글 목록을 조회합니다 (숨김 포함).", tags = "관리자 - 게시판 관리")
     @GetMapping("/{boardId}/posts")
     public Mono<String> listPosts(
             @PathVariable Long boardId,
@@ -104,6 +111,7 @@ public class AdminBoardController {
      * @param model 모델
      * @return 게시글 작성 폼 템플릿
      */
+    @Operation(summary = "관리자 게시글 작성 폼", description = "관리자가 새로운 게시글을 작성하기 위한 폼을 표시합니다.", tags = "관리자 - 게시판 관리")
     @GetMapping("/{boardId}/posts/new")
     public Mono<String> newPostForm(
             @PathVariable Long boardId,
@@ -143,6 +151,7 @@ public class AdminBoardController {
      * @param exchange ServerWebExchange
      * @return 게시글 목록으로 리다이렉트
      */
+    @Operation(summary = "관리자 게시글 작성", description = "관리자가 새로운 게시글을 작성합니다.", tags = "관리자 - 게시판 관리")
     @PostMapping("/{boardId}/posts")
     public Mono<String> createPost(
             @PathVariable Long boardId,
@@ -180,6 +189,7 @@ public class AdminBoardController {
      * @param model 모델
      * @return 게시글 수정 폼 템플릿
      */
+    @Operation(summary = "관리자 게시글 수정 폼", description = "관리자가 기존 게시글을 수정하기 위한 폼을 표시합니다.", tags = "관리자 - 게시판 관리")
     @GetMapping("/{boardId}/posts/{postId}/edit")
     public Mono<String> editPostForm(
             @PathVariable Long boardId,
@@ -226,6 +236,7 @@ public class AdminBoardController {
      * @param exchange ServerWebExchange
      * @return 게시글 목록으로 리다이렉트
      */
+    @Operation(summary = "관리자 게시글 수정", description = "관리자가 기존 게시글을 수정합니다.", tags = "관리자 - 게시판 관리")
     @PostMapping("/{boardId}/posts/{postId}")
     public Mono<String> updatePost(
             @PathVariable Long boardId,
@@ -266,6 +277,7 @@ public class AdminBoardController {
      * @param exchange ServerWebExchange
      * @return 게시글 목록으로 리다이렉트
      */
+    @Operation(summary = "관리자 게시글 삭제", description = "관리자가 게시글을 삭제합니다.", tags = "관리자 - 게시판 관리")
     @PostMapping("/{boardId}/posts/{postId}/delete")
     public Mono<String> deletePost(
             @PathVariable Long boardId,
@@ -298,6 +310,7 @@ public class AdminBoardController {
      * @param exchange ServerWebExchange
      * @return 게시글 목록으로 리다이렉트
      */
+    @Operation(summary = "관리자 게시글 숨김 토글", description = "관리자가 게시글의 숨김 상태를 토글합니다.", tags = "관리자 - 게시판 관리")
     @PostMapping("/{boardId}/posts/{postId}/toggle-hidden")
     public Mono<String> toggleHidden(
             @PathVariable Long boardId,

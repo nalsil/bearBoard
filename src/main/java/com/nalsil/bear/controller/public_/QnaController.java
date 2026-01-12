@@ -5,6 +5,9 @@ import com.nalsil.bear.dto.request.CreateQnaRequest;
 import com.nalsil.bear.mapper.QnaMapper;
 import com.nalsil.bear.service.CompanyService;
 import com.nalsil.bear.service.QnaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -17,6 +20,7 @@ import reactor.core.publisher.Mono;
  *
  * QnA 목록 조회, 상세 조회, 질문 등록 기능을 제공합니다.
  */
+@Tag(name = "공개 페이지 - QnA", description = "기업 공개 QnA 목록, 상세, 질문 등록 API")
 @Slf4j
 @Controller
 @RequestMapping("/{companyCode}/qna")
@@ -36,6 +40,7 @@ public class QnaController {
      * @param model 모델
      * @return QnA 목록 템플릿
      */
+    @Operation(summary = "QnA 목록 조회", description = "기업의 QnA 목록을 페이징하여 조회합니다.", tags = "공개 페이지 - QnA")
     @GetMapping
     public Mono<String> list(
             @PathVariable String companyCode,
@@ -76,6 +81,7 @@ public class QnaController {
      * @param model 모델
      * @return QnA 상세 템플릿
      */
+    @Operation(summary = "QnA 상세 조회", description = "특정 QnA의 상세 정보를 조회합니다.", tags = "공개 페이지 - QnA")
     @GetMapping("/{id}")
     public Mono<String> detail(
             @PathVariable String companyCode,
@@ -98,6 +104,7 @@ public class QnaController {
      * @param model 모델
      * @return QnA 질문 등록 폼 템플릿
      */
+    @Operation(summary = "QnA 질문 등록 폼", description = "QnA 질문을 등록하기 위한 폼을 표시합니다.", tags = "공개 페이지 - QnA")
     @GetMapping("/new")
     public Mono<String> createForm(
             @PathVariable String companyCode,
@@ -117,6 +124,7 @@ public class QnaController {
      * @param request 질문 등록 요청
      * @return 리다이렉트 URL
      */
+    @Operation(summary = "QnA 질문 등록", description = "새로운 QnA 질문을 등록합니다. 이메일 형식 검증을 수행합니다.", tags = "공개 페이지 - QnA")
     @PostMapping
     public Mono<String> create(
             @PathVariable String companyCode,

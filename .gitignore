@@ -65,3 +65,4 @@ bear-uploads/
 Thumbs.db
 *.tmp
 *.swp
+/nul

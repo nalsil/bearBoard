@@ -54,6 +54,8 @@ public class SecurityConfig {
                         })
                 )
                 .authorizeExchange(exchanges -> exchanges
+                        // Swagger UI 및 API docs는 인증 없이 접근 가능
+                        .pathMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/webjars/**").permitAll()
                         // 로그인 페이지는 인증 없이 접근 가능
                         .pathMatchers(HttpMethod.GET, "/admin/login").permitAll()
                         .pathMatchers(HttpMethod.POST, "/admin/login").permitAll()

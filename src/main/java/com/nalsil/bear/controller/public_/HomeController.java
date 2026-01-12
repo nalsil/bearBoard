@@ -4,6 +4,9 @@ import com.nalsil.bear.domain.company.Company;
 import com.nalsil.bear.service.CompanyService;
 import com.nalsil.bear.service.ProductService;
 import com.nalsil.bear.util.TenantContextHolder;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +22,7 @@ import reactor.core.publisher.Mono;
  * HomeController
  * 기업 홈페이지 메인 페이지 및 회사 소개 페이지 처리
  */
+@Tag(name = "공개 페이지 - 홈", description = "기업 공개 홈페이지 API")
 @Slf4j
 @Controller
 @RequestMapping("/{companyCode}")
@@ -35,6 +39,7 @@ public class HomeController {
      * @param companyCode 기업 코드
      * @return Rendering (Thymeleaf 템플릿)
      */
+    @Operation(summary = "기업 홈페이지 메인 페이지", description = "기업의 공개 홈페이지 메인 페이지를 표시합니다.", tags = "공개 페이지 - 홈")
     @GetMapping
     public Mono<Rendering> home(@PathVariable String companyCode) {
         log.info("Accessing home page for company: {}", companyCode);
@@ -64,6 +69,7 @@ public class HomeController {
      * @param companyCode 기업 코드
      * @return Rendering (Thymeleaf 템플릿)
      */
+    @Operation(summary = "회사 소개 페이지", description = "기업의 회사 소개 페이지를 표시합니다.", tags = "공개 페이지 - 홈")
     @GetMapping("/about")
     public Mono<Rendering> about(@PathVariable String companyCode) {
         log.info("Accessing about page for company: {}", companyCode);

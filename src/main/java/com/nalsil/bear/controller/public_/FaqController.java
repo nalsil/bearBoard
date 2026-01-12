@@ -2,6 +2,9 @@ package com.nalsil.bear.controller.public_;
 
 import com.nalsil.bear.service.CompanyService;
 import com.nalsil.bear.service.FaqService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -17,6 +20,7 @@ import reactor.core.publisher.Mono;
  *
  * FAQ 목록 조회 및 검색 기능을 제공합니다.
  */
+@Tag(name = "공개 페이지 - FAQ", description = "기업 공개 FAQ 목록 및 검색 API")
 @Slf4j
 @Controller
 @RequestMapping("/{companyCode}/faq")
@@ -35,6 +39,7 @@ public class FaqController {
      * @param model 모델
      * @return FAQ 목록 템플릿
      */
+    @Operation(summary = "FAQ 목록 조회", description = "기업의 FAQ 목록을 조회합니다. 카테고리 또는 키워드로 검색할 수 있습니다.", tags = "공개 페이지 - FAQ")
     @GetMapping
     public Mono<String> list(
             @PathVariable String companyCode,

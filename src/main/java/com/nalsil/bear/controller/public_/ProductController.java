@@ -4,6 +4,9 @@ import com.nalsil.bear.domain.company.Company;
 import com.nalsil.bear.service.CompanyService;
 import com.nalsil.bear.service.ProductService;
 import com.nalsil.bear.util.TenantContextHolder;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +22,7 @@ import reactor.core.publisher.Mono;
  * ProductController
  * 제품 목록 및 상세 페이지 처리
  */
+@Tag(name = "공개 페이지 - 상품", description = "기업 공개 상품 목록 API")
 @Slf4j
 @Controller
 @RequestMapping("/{companyCode}/products")
@@ -38,6 +42,7 @@ public class ProductController {
      * @param size 페이지 크기 (기본값: 12)
      * @return Rendering (Thymeleaf 템플릿)
      */
+    @Operation(summary = "제품 목록 조회", description = "기업의 제품 목록을 페이징하여 조회합니다. 카테고리로 필터링할 수 있습니다.", tags = "공개 페이지 - 상품")
     @GetMapping
     public Mono<Rendering> productList(
             @PathVariable String companyCode,
@@ -95,6 +100,7 @@ public class ProductController {
      * @param productId 제품 ID
      * @return Rendering (Thymeleaf 템플릿)
      */
+    @Operation(summary = "제품 상세 조회", description = "특정 제품의 상세 정보를 조회합니다.", tags = "공개 페이지 - 상품")
     @GetMapping("/{productId}")
     public Mono<Rendering> productDetail(
             @PathVariable String companyCode,

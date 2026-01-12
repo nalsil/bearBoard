@@ -37,7 +37,8 @@
       "mcp__playwright__browser_press_key",
       "mcp__playwright__browser_wait_for",
       "Bash(find:*)",
-      "Bash(tee:*)"
+      "Bash(tee:*)",
+      "WebSearch"
     ]
   }
 }

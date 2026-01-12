@@ -3,6 +3,11 @@ package com.nalsil.bear.controller.admin;
 import com.nalsil.bear.dto.response.AdminDashboardResponse;
 import com.nalsil.bear.service.*;
 import com.nalsil.bear.util.JwtUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseCookie;
@@ -20,10 +25,12 @@ import reactor.core.publisher.Mono;
  *
  * 관리자 대시보드 페이지 및 통계 정보를 제공합니다.
  */
+@Tag(name = "관리자 대시보드", description = "관리자 대시보드 및 기업 전환 API")
 @Slf4j
 @Controller
 @RequestMapping("/admin")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "JWT Cookie")
 public class AdminDashboardController {
 
     private final CompanyService companyService;
@@ -41,6 +48,15 @@ public class AdminDashboardController {
      * @param model 모델
      * @return 대시보드 템플릿
      */
+    @Operation(
+            summary = "관리자 대시보드",
+            description = "관리자 대시보드 페이지를 표시합니다. 게시글, FAQ, QnA, 유튜브 영상, 상품 통계를 제공합니다.",
+            tags = "관리자 대시보드"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "대시보드 조회 성공"),
+            @ApiResponse(responseCode = "302", description = "슈퍼관리자인 경우 기업 선택 페이지로 리다이렉트")
+    })
     @GetMapping("/dashboard")
     public Mono<String> dashboard(ServerWebExchange exchange, Model model) {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
@@ -97,6 +113,15 @@ public class AdminDashboardController {
      * @param model 모델
      * @return 기업 선택 템플릿
      */
+    @Operation(
+            summary = "슈퍼관리자 기업 선택 페이지",
+            description = "슈퍼관리자가 관리할 기업을 선택하는 페이지입니다. 슈퍼관리자만 접근 가능합니다.",
+            tags = "관리자 대시보드"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "기업 선택 페이지 조회 성공"),
+            @ApiResponse(responseCode = "302", description = "슈퍼관리자가 아닌 경우 대시보드로 리다이렉트")
+    })
     @GetMapping("/select-company")
     public Mono<String> selectCompany(ServerWebExchange exchange, Model model) {
         String adminRole = (String) exchange.getAttributes().get("role");
@@ -121,6 +146,23 @@ public class AdminDashboardController {
      * @param exchange ServerWebExchange
      * @return 대시보드로 리다이렉트
      */
+    @Operation(
+            summary = "기업 전환 처리",
+            description = """
+                    슈퍼관리자가 관리할 기업을 전환합니다.
+
+                    선택한 기업 ID로 새로운 JWT 토큰을 발급하여 해당 기업의 데이터를 관리할 수 있습니다.
+                    슈퍼관리자만 사용 가능합니다.
+
+                    **Form Data:**
+                    - companyId: 선택할 기업 ID
+                    """,
+            tags = "관리자 대시보드"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "302", description = "기업 전환 성공, 대시보드로 리다이렉트"),
+            @ApiResponse(responseCode = "302", description = "오류 발생, 기업 선택 페이지로 리다이렉트")
+    })
     @PostMapping("/switch-company")
     public Mono<String> switchCompany(ServerWebExchange exchange) {
         return exchange.getFormData()

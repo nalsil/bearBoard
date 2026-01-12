@@ -1,6 +1,8 @@
 package com.nalsil.bear.controller;
 
 import com.nalsil.bear.service.CompanyService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
@@ -15,6 +17,7 @@ import reactor.core.publisher.Mono;
  * IndexController
  * 루트 URL (/) 처리 - 모든 회사 목록 표시
  */
+@Tag(name = "인덱스", description = "루트 페이지 및 기업 목록 API")
 @Slf4j
 @Controller
 @RequiredArgsConstructor
@@ -28,6 +31,7 @@ public class IndexController {
      *
      * @return Rendering (Thymeleaf 템플릿)
      */
+    @Operation(summary = "루트 페이지", description = "접속 가능한 모든 활성 기업 목록을 표시합니다.", tags = "인덱스")
     @GetMapping("/")
     public Mono<Rendering> index() {
         log.info("Accessing root page - company list");
@@ -40,6 +44,7 @@ public class IndexController {
     }
 
 
+    @Operation(summary = "파비콘 조회", description = "웹사이트 파비콘을 반환합니다.", tags = "인덱스")
     @GetMapping(value = "/favicon.ico", produces = "image/x-icon")
     @ResponseBody
     public Mono<Resource> favicon() {

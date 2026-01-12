@@ -71,3 +71,24 @@ logging:
     reactor.netty: DEBUG
     io.r2dbc.postgresql: DEBUG        # 사용하는 DB 드라이버 로그 (PostgreSQL 예시)
 
+# SpringDoc OpenAPI (Swagger) 설정
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    groups-order: ASC
+    operations-sorter: alpha
+    tags-sorter: alpha
+    try-it-out-enabled: true
+    display-request-duration: true
+  show-actuator: false
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  paths-to-exclude: /error, /actuator/**
+  model-and-view-allowed: true
+  override-with-generic-response: false
+  packages-to-scan: com.nalsil.bear.controller
+  use-management-port: false

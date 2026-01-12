@@ -5,6 +5,9 @@ import com.nalsil.bear.service.BoardService;
 import com.nalsil.bear.service.CompanyService;
 import com.nalsil.bear.service.PostService;
 import com.nalsil.bear.util.TenantContextHolder;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +23,7 @@ import reactor.core.publisher.Mono;
  * BoardController
  * 게시판 목록 및 게시글 상세 페이지 처리
  */
+@Tag(name = "공개 페이지 - 게시판", description = "기업 공개 게시판 목록 및 상세 API")
 @Slf4j
 @Controller
 @RequestMapping("/{companyCode}/board")
@@ -40,6 +44,7 @@ public class BoardController {
      * @param size 페이지 크기 (기본값: 10)
      * @return Rendering (Thymeleaf 템플릿)
      */
+    @Operation(summary = "게시판 목록 조회", description = "특정 타입의 게시판 목록을 페이징하여 조회합니다.", tags = "공개 페이지 - 게시판")
     @GetMapping("/{boardType}")
     public Mono<Rendering> boardList(
             @PathVariable String companyCode,
@@ -92,6 +97,7 @@ public class BoardController {
      * @param postId 게시글 ID
      * @return Rendering (Thymeleaf 템플릿)
      */
+    @Operation(summary = "게시글 상세 조회", description = "특정 게시글의 상세 정보를 조회합니다. 조회 시 조회수가 증가합니다.", tags = "공개 페이지 - 게시판")
     @GetMapping("/{boardType}/{postId}")
     public Mono<Rendering> postDetail(
             @PathVariable String companyCode,
