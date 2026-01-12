@@ -4,6 +4,9 @@ import com.nalsil.bear.service.CompanyService;
 import com.nalsil.bear.service.FaqService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +43,15 @@ public class FaqController {
      * @return FAQ 목록 템플릿
      */
     @Operation(summary = "FAQ 목록 조회", description = "기업의 FAQ 목록을 조회합니다. 카테고리 또는 키워드로 검색할 수 있습니다.", tags = "공개 페이지 - FAQ")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @GetMapping
     public Mono<String> list(
             @PathVariable String companyCode,

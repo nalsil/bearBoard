@@ -6,6 +6,9 @@ import com.nalsil.bear.service.ProductService;
 import com.nalsil.bear.util.TenantContextHolder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +43,15 @@ public class HomeController {
      * @return Rendering (Thymeleaf 템플릿)
      */
     @Operation(summary = "기업 홈페이지 메인 페이지", description = "기업의 공개 홈페이지 메인 페이지를 표시합니다.", tags = "공개 페이지 - 홈")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @GetMapping
     public Mono<Rendering> home(@PathVariable String companyCode) {
         log.info("Accessing home page for company: {}", companyCode);
@@ -70,6 +82,15 @@ public class HomeController {
      * @return Rendering (Thymeleaf 템플릿)
      */
     @Operation(summary = "회사 소개 페이지", description = "기업의 회사 소개 페이지를 표시합니다.", tags = "공개 페이지 - 홈")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @GetMapping("/about")
     public Mono<Rendering> about(@PathVariable String companyCode) {
         log.info("Accessing about page for company: {}", companyCode);

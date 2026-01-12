@@ -6,6 +6,9 @@ import com.nalsil.bear.service.AdminService;
 import com.nalsil.bear.service.CompanyService;
 import com.nalsil.bear.service.YoutubeVideoService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +45,15 @@ public class AdminYoutubeController {
      * @return 유튜브 영상 목록 템플릿
      */
     @Operation(summary = "관리자 유튜브 영상 목록 조회", description = "관리자가 자신의 기업 유튜브 영상 목록을 조회합니다.", tags = "관리자 - 유튜브 관리")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @GetMapping
     public Mono<String> list(ServerWebExchange exchange, Model model) {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
@@ -66,6 +78,15 @@ public class AdminYoutubeController {
      * @return 유튜브 영상 등록 폼 템플릿
      */
     @Operation(summary = "관리자 유튜브 영상 등록 폼", description = "관리자가 새로운 유튜브 영상을 등록하기 위한 폼을 표시합니다.", tags = "관리자 - 유튜브 관리")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @GetMapping("/new")
     public Mono<String> newVideoForm(ServerWebExchange exchange, Model model) {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
@@ -86,6 +107,15 @@ public class AdminYoutubeController {
      * @return 유튜브 영상 목록으로 리다이렉트
      */
     @Operation(summary = "관리자 유튜브 영상 등록", description = "관리자가 새로운 유튜브 영상을 등록합니다.", tags = "관리자 - 유튜브 관리")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @PostMapping
     public Mono<String> createVideo(@ModelAttribute YoutubeVideo video, ServerWebExchange exchange) {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
@@ -117,6 +147,15 @@ public class AdminYoutubeController {
      * @return 유튜브 영상 수정 폼 템플릿
      */
     @Operation(summary = "관리자 유튜브 영상 수정 폼", description = "관리자가 기존 유튜브 영상을 수정하기 위한 폼을 표시합니다.", tags = "관리자 - 유튜브 관리")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @GetMapping("/{id}/edit")
     public Mono<String> editVideoForm(
             @PathVariable Long id,
@@ -155,6 +194,15 @@ public class AdminYoutubeController {
      * @return 유튜브 영상 목록으로 리다이렉트
      */
     @Operation(summary = "관리자 유튜브 영상 수정", description = "관리자가 기존 유튜브 영상을 수정합니다.", tags = "관리자 - 유튜브 관리")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @PostMapping("/{id}")
     public Mono<String> updateVideo(
             @PathVariable Long id,
@@ -199,6 +247,15 @@ public class AdminYoutubeController {
      * @return 유튜브 영상 목록으로 리다이렉트
      */
     @Operation(summary = "관리자 유튜브 영상 삭제", description = "관리자가 유튜브 영상을 삭제합니다.", tags = "관리자 - 유튜브 관리")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @PostMapping("/{id}/delete")
     public Mono<String> deleteVideo(@PathVariable Long id, ServerWebExchange exchange) {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
@@ -227,6 +284,15 @@ public class AdminYoutubeController {
      * @return 유튜브 영상 목록으로 리다이렉트
      */
     @Operation(summary = "관리자 유튜브 영상 숨김 토글", description = "관리자가 유튜브 영상의 숨김 상태를 토글합니다.", tags = "관리자 - 유튜브 관리")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @PostMapping("/{id}/toggle-hidden")
     public Mono<String> toggleHidden(@PathVariable Long id, ServerWebExchange exchange) {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");

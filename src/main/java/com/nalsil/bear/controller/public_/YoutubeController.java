@@ -4,6 +4,9 @@ import com.nalsil.bear.service.CompanyService;
 import com.nalsil.bear.service.YoutubeVideoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +40,15 @@ public class YoutubeController {
      * @return 유튜브 영상 목록 템플릿
      */
     @Operation(summary = "유튜브 영상 목록 조회", description = "기업의 유튜브 영상 목록을 조회합니다.", tags = "공개 페이지 - 유튜브")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @GetMapping
     public Mono<String> list(
             @PathVariable String companyCode,
@@ -65,6 +77,15 @@ public class YoutubeController {
      * @return 유튜브 영상 재생 템플릿
      */
     @Operation(summary = "유튜브 영상 재생", description = "특정 유튜브 영상을 재생합니다.", tags = "공개 페이지 - 유튜브")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @GetMapping("/{id}")
     public Mono<String> player(
             @PathVariable String companyCode,

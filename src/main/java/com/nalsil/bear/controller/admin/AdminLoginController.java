@@ -45,7 +45,13 @@ public class AdminLoginController {
             tags = "관리자 인증"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "로그인 페이지 조회 성공")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "로그인 페이지 조회 성공",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
     })
     @GetMapping("/login")
     public Mono<String> loginPage(Model model) {
@@ -56,9 +62,7 @@ public class AdminLoginController {
     /**
      * 관리자 로그인 처리 - JWT 토큰 발급
      *
-     * @param request 로그인 요청
      * @param exchange ServerWebExchange
-     * @param model 모델
      * @return 로그인 성공 시 대시보드로 리다이렉트, 실패 시 로그인 페이지
      */
     @Operation(
@@ -76,8 +80,20 @@ public class AdminLoginController {
             tags = "관리자 인증"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "302", description = "로그인 성공, 대시보드로 리다이렉트"),
-            @ApiResponse(responseCode = "200", description = "로그인 실패, 로그인 페이지 재표시")
+            @ApiResponse(
+                    responseCode = "302",
+                    description = "로그인 성공, 대시보드로 리다이렉트",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "로그인 실패, 로그인 페이지 재표시",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
     })
     @PostMapping("/login")
     public Mono<String> login(ServerWebExchange exchange) {
@@ -152,7 +168,13 @@ public class AdminLoginController {
             tags = "관리자 인증"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "302", description = "로그아웃 성공, 로그인 페이지로 리다이렉트")
+            @ApiResponse(
+                    responseCode = "302",
+                    description = "로그아웃 성공, 로그인 페이지로 리다이렉트",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
     })
     @GetMapping("/logout")
     public Mono<String> logout(ServerWebExchange exchange) {

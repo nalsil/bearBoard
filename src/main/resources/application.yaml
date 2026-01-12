@@ -60,17 +60,6 @@ management:
     health:
       show-details: when-authorized
 
-# 로깅 설정
-logging:
-  level:
-    com.nalsil.bear: DEBUG
-    org.springframework.r2dbc: DEBUG
-    org.springframework.security: DEBUG
-    org.springframework.web: DEBUG
-    org.springframework.web.server: TRACE
-    reactor.netty: DEBUG
-    io.r2dbc.postgresql: DEBUG        # 사용하는 DB 드라이버 로그 (PostgreSQL 예시)
-
 # SpringDoc OpenAPI (Swagger) 설정
 springdoc:
   api-docs:
@@ -92,3 +81,14 @@ springdoc:
   override-with-generic-response: false
   packages-to-scan: com.nalsil.bear.controller
   use-management-port: false
+
+# 로깅 설정
+logging:
+  level:
+    com.nalsil.bear: DEBUG
+    org.springframework.r2dbc: INFO
+    org.springframework.security: INFO
+    org.springframework.web: INFO
+    org.springframework.web.server: INFO
+    reactor.netty: INFO
+    io.r2dbc.postgresql: INFO        # 사용하는 DB 드라이버 로그 (PostgreSQL 예시)

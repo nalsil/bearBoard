@@ -6,6 +6,9 @@ import com.nalsil.bear.service.ProductService;
 import com.nalsil.bear.util.TenantContextHolder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +46,15 @@ public class ProductController {
      * @return Rendering (Thymeleaf 템플릿)
      */
     @Operation(summary = "제품 목록 조회", description = "기업의 제품 목록을 페이징하여 조회합니다. 카테고리로 필터링할 수 있습니다.", tags = "공개 페이지 - 상품")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @GetMapping
     public Mono<Rendering> productList(
             @PathVariable String companyCode,
@@ -101,6 +113,15 @@ public class ProductController {
      * @return Rendering (Thymeleaf 템플릿)
      */
     @Operation(summary = "제품 상세 조회", description = "특정 제품의 상세 정보를 조회합니다.", tags = "공개 페이지 - 상품")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @GetMapping("/{productId}")
     public Mono<Rendering> productDetail(
             @PathVariable String companyCode,

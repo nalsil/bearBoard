@@ -7,6 +7,9 @@ import com.nalsil.bear.service.CompanyService;
 import com.nalsil.bear.service.QnaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +44,15 @@ public class QnaController {
      * @return QnA 목록 템플릿
      */
     @Operation(summary = "QnA 목록 조회", description = "기업의 QnA 목록을 페이징하여 조회합니다.", tags = "공개 페이지 - QnA")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @GetMapping
     public Mono<String> list(
             @PathVariable String companyCode,
@@ -82,6 +94,15 @@ public class QnaController {
      * @return QnA 상세 템플릿
      */
     @Operation(summary = "QnA 상세 조회", description = "특정 QnA의 상세 정보를 조회합니다.", tags = "공개 페이지 - QnA")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @GetMapping("/{id}")
     public Mono<String> detail(
             @PathVariable String companyCode,
@@ -105,6 +126,15 @@ public class QnaController {
      * @return QnA 질문 등록 폼 템플릿
      */
     @Operation(summary = "QnA 질문 등록 폼", description = "QnA 질문을 등록하기 위한 폼을 표시합니다.", tags = "공개 페이지 - QnA")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @GetMapping("/new")
     public Mono<String> createForm(
             @PathVariable String companyCode,
@@ -125,6 +155,15 @@ public class QnaController {
      * @return 리다이렉트 URL
      */
     @Operation(summary = "QnA 질문 등록", description = "새로운 QnA 질문을 등록합니다. 이메일 형식 검증을 수행합니다.", tags = "공개 페이지 - QnA")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @PostMapping
     public Mono<String> create(
             @PathVariable String companyCode,

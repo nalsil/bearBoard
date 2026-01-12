@@ -7,6 +7,9 @@ import com.nalsil.bear.service.PostService;
 import com.nalsil.bear.util.TenantContextHolder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,12 +42,21 @@ public class BoardController {
      * URL: /{companyCode}/board/{boardType}
      *
      * @param companyCode 기업 코드
-     * @param boardType 게시판 타입 (notice, press, recruit 등)
-     * @param page 페이지 번호 (기본값: 0)
-     * @param size 페이지 크기 (기본값: 10)
+     * @param boardType   게시판 타입 (notice, press, recruit 등)
+     * @param page        페이지 번호 (기본값: 0)
+     * @param size        페이지 크기 (기본값: 10)
      * @return Rendering (Thymeleaf 템플릿)
      */
     @Operation(summary = "게시판 목록 조회", description = "특정 타입의 게시판 목록을 페이징하여 조회합니다.", tags = "공개 페이지 - 게시판")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @GetMapping("/{boardType}")
     public Mono<Rendering> boardList(
             @PathVariable String companyCode,
@@ -93,11 +105,20 @@ public class BoardController {
      * URL: /{companyCode}/board/{boardType}/{postId}
      *
      * @param companyCode 기업 코드
-     * @param boardType 게시판 타입
-     * @param postId 게시글 ID
+     * @param boardType   게시판 타입
+     * @param postId      게시글 ID
      * @return Rendering (Thymeleaf 템플릿)
      */
     @Operation(summary = "게시글 상세 조회", description = "특정 게시글의 상세 정보를 조회합니다. 조회 시 조회수가 증가합니다.", tags = "공개 페이지 - 게시판")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @GetMapping("/{boardType}/{postId}")
     public Mono<Rendering> postDetail(
             @PathVariable String companyCode,

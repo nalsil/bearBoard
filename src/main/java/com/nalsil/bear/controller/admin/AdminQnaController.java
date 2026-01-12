@@ -6,6 +6,9 @@ import com.nalsil.bear.service.AdminService;
 import com.nalsil.bear.service.CompanyService;
 import com.nalsil.bear.service.QnaService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +45,15 @@ public class AdminQnaController {
      * @return QnA 목록 템플릿
      */
     @Operation(summary = "관리자 QnA 목록 조회", description = "관리자가 자신의 기업 QnA 목록을 조회합니다.", tags = "관리자 - QnA 관리")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @GetMapping
     public Mono<String> list(ServerWebExchange exchange, Model model) {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
@@ -67,6 +79,15 @@ public class AdminQnaController {
      * @return QnA 상세 템플릿
      */
     @Operation(summary = "관리자 QnA 상세 조회", description = "관리자가 QnA 상세 정보를 조회하고 답변을 작성할 수 있습니다.", tags = "관리자 - QnA 관리")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @GetMapping("/{id}")
     public Mono<String> detail(
             @PathVariable Long id,
@@ -105,6 +126,15 @@ public class AdminQnaController {
      * @return QnA 목록으로 리다이렉트
      */
     @Operation(summary = "관리자 QnA 답변 작성", description = "관리자가 QnA에 답변을 작성하거나 수정합니다.", tags = "관리자 - QnA 관리")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @PostMapping("/{id}/answer")
     public Mono<String> answer(
             @PathVariable Long id,
@@ -141,6 +171,15 @@ public class AdminQnaController {
      * @return QnA 목록으로 리다이렉트
      */
     @Operation(summary = "관리자 QnA 숨김 토글", description = "관리자가 QnA의 숨김 상태를 토글합니다.", tags = "관리자 - QnA 관리")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @PostMapping("/{id}/toggle-hidden")
     public Mono<String> toggleHidden(@PathVariable Long id, ServerWebExchange exchange) {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");
@@ -171,6 +210,15 @@ public class AdminQnaController {
      * @return QnA 목록으로 리다이렉트
      */
     @Operation(summary = "관리자 QnA 삭제", description = "관리자가 QnA를 삭제합니다.", tags = "관리자 - QnA 관리")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
+    })
     @PostMapping("/{id}/delete")
     public Mono<String> delete(@PathVariable Long id, ServerWebExchange exchange) {
         Long adminCompanyId = (Long) exchange.getAttributes().get("companyId");

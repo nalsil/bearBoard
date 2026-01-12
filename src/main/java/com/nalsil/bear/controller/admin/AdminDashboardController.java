@@ -4,6 +4,7 @@ import com.nalsil.bear.dto.response.AdminDashboardResponse;
 import com.nalsil.bear.service.*;
 import com.nalsil.bear.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -22,7 +23,7 @@ import reactor.core.publisher.Mono;
 
 /**
  * 관리자 대시보드 컨트롤러
- *
+ * <p>
  * 관리자 대시보드 페이지 및 통계 정보를 제공합니다.
  */
 @Tag(name = "관리자 대시보드", description = "관리자 대시보드 및 기업 전환 API")
@@ -45,7 +46,7 @@ public class AdminDashboardController {
      * 관리자 대시보드
      *
      * @param exchange ServerWebExchange
-     * @param model 모델
+     * @param model    모델
      * @return 대시보드 템플릿
      */
     @Operation(
@@ -54,8 +55,18 @@ public class AdminDashboardController {
             tags = "관리자 대시보드"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "대시보드 조회 성공"),
-            @ApiResponse(responseCode = "302", description = "슈퍼관리자인 경우 기업 선택 페이지로 리다이렉트")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTML 페이지(대시보드 조회 성공)",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            ),
+            @ApiResponse(responseCode = "302", description = "슈퍼관리자인 경우 기업 선택 페이지로 리다이렉트",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
     })
     @GetMapping("/dashboard")
     public Mono<String> dashboard(ServerWebExchange exchange, Model model) {
@@ -73,9 +84,9 @@ public class AdminDashboardController {
         // 슈퍼유저인 경우 모든 기업 목록 조회
         Mono<Void> companiesTask = isSuperAdmin
                 ? companyService.getAllCompanies()
-                        .collectList()
-                        .doOnNext(companies -> model.addAttribute("companies", companies))
-                        .then()
+                .collectList()
+                .doOnNext(companies -> model.addAttribute("companies", companies))
+                .then()
                 : Mono.empty();
 
         // 대시보드 통계 조회
@@ -110,7 +121,7 @@ public class AdminDashboardController {
      * 슈퍼유저 기업 선택 페이지
      *
      * @param exchange ServerWebExchange
-     * @param model 모델
+     * @param model    모델
      * @return 기업 선택 템플릿
      */
     @Operation(
@@ -119,8 +130,18 @@ public class AdminDashboardController {
             tags = "관리자 대시보드"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "기업 선택 페이지 조회 성공"),
-            @ApiResponse(responseCode = "302", description = "슈퍼관리자가 아닌 경우 대시보드로 리다이렉트")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "기업 선택 페이지 조회 성공",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            ),
+            @ApiResponse(responseCode = "302", description = "슈퍼관리자가 아닌 경우 대시보드로 리다이렉트",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
     })
     @GetMapping("/select-company")
     public Mono<String> selectCompany(ServerWebExchange exchange, Model model) {
@@ -140,7 +161,7 @@ public class AdminDashboardController {
 
     /**
      * 기업 전환 처리
-     *
+     * <p>
      * 슈퍼관리자가 기업을 선택하면 새로운 JWT 토큰을 발급합니다.
      *
      * @param exchange ServerWebExchange
@@ -150,85 +171,95 @@ public class AdminDashboardController {
             summary = "기업 전환 처리",
             description = """
                     슈퍼관리자가 관리할 기업을 전환합니다.
-
+                    
                     선택한 기업 ID로 새로운 JWT 토큰을 발급하여 해당 기업의 데이터를 관리할 수 있습니다.
                     슈퍼관리자만 사용 가능합니다.
-
+                    
                     **Form Data:**
                     - companyId: 선택할 기업 ID
                     """,
             tags = "관리자 대시보드"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "302", description = "기업 전환 성공, 대시보드로 리다이렉트"),
-            @ApiResponse(responseCode = "302", description = "오류 발생, 기업 선택 페이지로 리다이렉트")
+            @ApiResponse(
+                    responseCode = "302",
+                    description = "기업 전환 성공, 대시보드로 리다이렉트",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            ),
+            @ApiResponse(responseCode = "302", description = "오류 발생, 기업 선택 페이지로 리다이렉트",
+                    content = @Content(
+                            mediaType = "text/html"
+                    )
+            )
     })
     @PostMapping("/switch-company")
     public Mono<String> switchCompany(ServerWebExchange exchange) {
         return exchange.getFormData()
-            .flatMap(formData -> {
-                String companyIdStr = formData.getFirst("companyId");
-                if (companyIdStr == null || companyIdStr.isEmpty()) {
-                    log.error("companyId 파라미터가 누락됨");
-                    return Mono.just("redirect:/admin/select-company?error=invalid_company");
-                }
+                .flatMap(formData -> {
+                    String companyIdStr = formData.getFirst("companyId");
+                    if (companyIdStr == null || companyIdStr.isEmpty()) {
+                        log.error("companyId 파라미터가 누락됨");
+                        return Mono.just("redirect:/admin/select-company?error=invalid_company");
+                    }
 
-                Long companyId;
-                try {
-                    companyId = Long.parseLong(companyIdStr);
-                } catch (NumberFormatException e) {
-                    log.error("유효하지 않은 companyId 형식: {}", companyIdStr);
-                    return Mono.just("redirect:/admin/select-company?error=invalid_company");
-                }
+                    Long companyId;
+                    try {
+                        companyId = Long.parseLong(companyIdStr);
+                    } catch (NumberFormatException e) {
+                        log.error("유효하지 않은 companyId 형식: {}", companyIdStr);
+                        return Mono.just("redirect:/admin/select-company?error=invalid_company");
+                    }
 
-                String adminRole = (String) exchange.getAttributes().get("role");
-                Long adminId = (Long) exchange.getAttributes().get("adminId");
-                String username = (String) exchange.getAttributes().get("username");
+                    String adminRole = (String) exchange.getAttributes().get("role");
+                    Long adminId = (Long) exchange.getAttributes().get("adminId");
+                    String username = (String) exchange.getAttributes().get("username");
 
-                log.info("기업 전환 요청: adminId={}, username={}, role={}, companyId={}",
-                        adminId, username, adminRole, companyId);
+                    log.info("기업 전환 요청: adminId={}, username={}, role={}, companyId={}",
+                            adminId, username, adminRole, companyId);
 
-                // 슈퍼관리자가 아니면 대시보드로 리다이렉트
-                if (!"SUPER_ADMIN".equals(adminRole)) {
-                    log.warn("슈퍼관리자가 아닌 사용자의 기업 전환 시도");
-                    return Mono.just("redirect:/admin/dashboard");
-                }
+                    // 슈퍼관리자가 아니면 대시보드로 리다이렉트
+                    if (!"SUPER_ADMIN".equals(adminRole)) {
+                        log.warn("슈퍼관리자가 아닌 사용자의 기업 전환 시도");
+                        return Mono.just("redirect:/admin/dashboard");
+                    }
 
-                // 선택한 기업이 유효한지 확인
-                return companyService.getCompanyById(companyId)
-                        .flatMap(company -> {
-                            if (!company.getIsActive()) {
-                                log.warn("비활성화된 기업 선택 시도: companyId={}", companyId);
-                                return Mono.just("redirect:/admin/select-company?error=inactive_company");
-                            }
+                    // 선택한 기업이 유효한지 확인
+                    return companyService.getCompanyById(companyId)
+                            .flatMap(company -> {
+                                if (!company.getIsActive()) {
+                                    log.warn("비활성화된 기업 선택 시도: companyId={}", companyId);
+                                    return Mono.just("redirect:/admin/select-company?error=inactive_company");
+                                }
 
-                            // 새로운 JWT 토큰 발급 (선택한 companyId 포함)
-                            String newToken = jwtUtil.generateToken(username, adminId, companyId, adminRole);
+                                // 새로운 JWT 토큰 발급 (선택한 companyId 포함)
+                                String newToken = jwtUtil.generateToken(username, adminId, companyId, adminRole);
 
-                            log.info("슈퍼관리자 기업 전환 성공: username={}, companyId={}, companyName={}",
-                                    username, companyId, company.getName());
+                                log.info("슈퍼관리자 기업 전환 성공: username={}, companyId={}, companyName={}",
+                                        username, companyId, company.getName());
 
-                            // JWT 토큰을 HTTP-Only Cookie에 저장
-                            ResponseCookie cookie = ResponseCookie.from("JWT-TOKEN", newToken)
-                                    .httpOnly(true)
-                                    .secure(false) // HTTPS에서는 true로 설정
-                                    .path("/")
-                                    .maxAge(24 * 60 * 60) // 24시간
-                                    .sameSite("Lax")
-                                    .build();
+                                // JWT 토큰을 HTTP-Only Cookie에 저장
+                                ResponseCookie cookie = ResponseCookie.from("JWT-TOKEN", newToken)
+                                        .httpOnly(true)
+                                        .secure(false) // HTTPS에서는 true로 설정
+                                        .path("/")
+                                        .maxAge(24 * 60 * 60) // 24시간
+                                        .sameSite("Lax")
+                                        .build();
 
-                            exchange.getResponse().addCookie(cookie);
+                                exchange.getResponse().addCookie(cookie);
 
-                            return Mono.just("redirect:/admin/dashboard");
-                        })
-                        .switchIfEmpty(Mono.defer(() -> {
-                            log.error("유효하지 않은 기업 ID: companyId={}", companyId);
-                            return Mono.just("redirect:/admin/select-company?error=invalid_company");
-                        }))
-                        .onErrorResume(e -> {
-                            log.error("기업 전환 처리 중 오류 발생", e);
-                            return Mono.just("redirect:/admin/select-company?error=system_error");
-                        });
-            });
+                                return Mono.just("redirect:/admin/dashboard");
+                            })
+                            .switchIfEmpty(Mono.defer(() -> {
+                                log.error("유효하지 않은 기업 ID: companyId={}", companyId);
+                                return Mono.just("redirect:/admin/select-company?error=invalid_company");
+                            }))
+                            .onErrorResume(e -> {
+                                log.error("기업 전환 처리 중 오류 발생", e);
+                                return Mono.just("redirect:/admin/select-company?error=system_error");
+                            });
+                });
     }
 }
