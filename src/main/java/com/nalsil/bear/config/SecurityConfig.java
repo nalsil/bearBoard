@@ -44,10 +44,24 @@ public class SecurityConfig {
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 // JWT 필터를 인증 필터 전에 추가
                 .addFilterBefore(jwtAuthenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+                // 인증 실패 시 처리
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint((exchange, ex) -> {
+                            log.warn("인증 실패: path={}, error={}",
+                                    exchange.getRequest().getPath(), ex.getMessage());
+                            exchange.getResponse().setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
+                            return exchange.getResponse().setComplete();
+                        })
+                )
                 .authorizeExchange(exchanges -> exchanges
                         // 로그인 페이지는 인증 없이 접근 가능
                         .pathMatchers(HttpMethod.GET, "/admin/login").permitAll()
                         .pathMatchers(HttpMethod.POST, "/admin/login").permitAll()
+                        // 로그아웃은 인증 없이 접근 가능
+                        .pathMatchers(HttpMethod.GET, "/admin/logout").permitAll()
+                        // 슈퍼관리자 기업 선택 페이지는 인증된 사용자만 접근 (JWT 필터에서 검증)
+                        .pathMatchers(HttpMethod.GET, "/admin/select-company").authenticated()
+                        .pathMatchers(HttpMethod.POST, "/admin/switch-company").authenticated()
                         // 정적 리소스는 인증 없이 접근 가능
                         .pathMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
                         .pathMatchers("/actuator/health").permitAll()

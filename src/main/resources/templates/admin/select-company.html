@@ -198,17 +198,17 @@
         <h1>🏢 기업 선택</h1>
         <p class="subtitle">관리할 기업을 선택하세요</p>
 
-        <!-- JWT 기반 인증 안내 -->
-        <div class="alert" style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 1rem; margin-bottom: 1.5rem; border-radius: 6px; color: #856404;">
-            <strong>⚠️ JWT 기반 인증 안내</strong><br>
-            현재 JWT 토큰 기반 인증을 사용하고 있습니다.<br>
-            기업 전환 기능은 지원되지 않으며, 다른 기업으로 전환하려면 <strong>로그아웃 후 재로그인</strong>이 필요합니다.
+        <!-- 기업 선택 안내 -->
+        <div class="alert" style="background-color: #e3f2fd; border-left: 4px solid #2196f3; padding: 1rem; margin-bottom: 1.5rem; border-radius: 6px; color: #0d47a1;">
+            <strong>ℹ️ 기업 선택 안내</strong><br>
+            관리할 기업을 선택하세요. 선택한 기업의 데이터만 조회 및 관리할 수 있습니다.
         </div>
 
         <!-- 에러 메시지 -->
-        <div class="alert alert-error" th:if="${param.error}">
-            <span th:if="${param.error[0] == 'invalid_company'}">유효하지 않은 기업입니다.</span>
-            <span th:if="${param.error[0] == 'jwt_not_supported'}">JWT 기반 인증에서는 기업 전환이 지원되지 않습니다. 로그아웃 후 다시 로그인해주세요.</span>
+        <div class="alert alert-error" th:if="${param.error != null and !#lists.isEmpty(param.error)}">
+            <span th:if="${param.error[0] == 'invalid_company'}">⚠️ 유효하지 않은 기업입니다.</span>
+            <span th:if="${param.error[0] == 'inactive_company'}">⚠️ 비활성화된 기업은 선택할 수 없습니다.</span>
+            <span th:if="${param.error[0] == 'system_error'}">⚠️ 시스템 오류가 발생했습니다. 다시 시도해주세요.</span>
         </div>
 
         <!-- 기업이 없는 경우 -->
@@ -219,46 +219,51 @@
             <p>등록된 기업이 없습니다.</p>
         </div>
 
-        <!-- 기업 카드 그리드 (3개 이하일 때만 표시) - JWT 기반 인증에서는 비활성화 -->
+        <!-- 기업 카드 그리드 (3개 이하일 때만 표시) -->
         <div class="company-grid" th:if="${companies != null and companies.size() <= 3}">
-            <div th:each="company : ${companies}" class="company-card" style="opacity: 0.6; cursor: not-allowed;">
-                <div class="company-name" th:text="${company.name}">기업명</div>
-                <div class="company-code" th:text="${company.code}">company-code</div>
-                <span class="company-status"
-                      th:classappend="${company.isActive ? 'active' : 'inactive'}"
-                      th:text="${company.isActive ? '활성' : '비활성'}">활성</span>
-                <div style="margin-top: 0.5rem; font-size: 0.75rem; color: #856404;">
-                    ℹ️ 재로그인 필요
-                </div>
-            </div>
+            <form th:each="company : ${companies}" th:action="@{/admin/switch-company}" method="post">
+                <input type="hidden" name="companyId" th:value="${company.id}">
+                <button type="submit" class="company-card" th:classappend="${!company.isActive ? 'inactive' : ''}" th:disabled="${!company.isActive}" style="width: 100%; background: none; text-align: left;">
+                    <div class="company-name" th:text="${company.name}">기업명</div>
+                    <div class="company-code" th:text="${company.code}">company-code</div>
+                    <span class="company-status"
+                          th:classappend="${company.isActive ? 'active' : 'inactive'}"
+                          th:text="${company.isActive ? '활성' : '비활성'}">활성</span>
+                </button>
+            </form>
         </div>
 
-        <!-- 기업 선택 폼 (4개 이상일 때) - JWT 기반 인증에서는 비활성화 -->
+        <!-- 기업 선택 폼 (4개 이상일 때) -->
         <div class="form-section" th:if="${companies != null and companies.size() > 3}">
             <h2>기업 목록</h2>
-            <div class="form-group">
-                <label for="companyId">기업 정보 (전환 불가)</label>
-                <select id="companyId" name="companyId" disabled style="background-color: #f5f5f5; cursor: not-allowed;">
-                    <option value="">재로그인을 통해 기업을 선택하세요</option>
-                    <option th:each="company : ${companies}"
-                            th:value="${company.id}"
-                            th:text="${company.name + ' (' + company.code + ')' + (!company.isActive ? ' - 비활성' : '')}">
-                        기업명 (code)
-                    </option>
-                </select>
-            </div>
-            <a th:href="@{/admin/logout}" style="display: block; width: 100%; padding: 0.875rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-align: center; text-decoration: none; border-radius: 6px; font-size: 1rem; font-weight: 600;">
-                로그아웃하고 다시 로그인
-            </a>
+            <form th:action="@{/admin/switch-company}" method="post">
+                <div class="form-group">
+                    <label for="companyId">관리할 기업 선택</label>
+                    <select id="companyId" name="companyId" required>
+                        <option value="">기업을 선택하세요</option>
+                        <option th:each="company : ${companies}"
+                                th:value="${company.id}"
+                                th:text="${company.name + ' (' + company.code + ')' + (!company.isActive ? ' - 비활성' : '')}"
+                                th:disabled="${!company.isActive}">
+                            기업명 (code)
+                        </option>
+                    </select>
+                </div>
+                <button type="submit">선택한 기업으로 이동</button>
+            </form>
         </div>
     </div>
 
     <script>
-        // JWT 기반 인증: 기업 전환 불가 안내
-        document.querySelectorAll('.company-card').forEach(card => {
-            card.addEventListener('click', function(e) {
-                e.preventDefault();
-                alert('JWT 토큰 기반 인증을 사용 중입니다.\n다른 기업으로 전환하려면 로그아웃 후 다시 로그인해주세요.');
+        // 기업 선택 시 확인 메시지
+        const forms = document.querySelectorAll('form[action*="switch-company"]');
+        forms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const companyName = this.querySelector('.company-name')?.textContent ||
+                                  this.querySelector('select option:checked')?.textContent;
+                if (companyName && !confirm(`"${companyName}" 기업으로 전환하시겠습니까?`)) {
+                    e.preventDefault();
+                }
             });
         });
     </script>

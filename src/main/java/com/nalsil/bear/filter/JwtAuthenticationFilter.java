@@ -36,11 +36,13 @@ public class JwtAuthenticationFilter implements WebFilter {
         log.info("========== JwtAuthenticationFilter 실행 ==========");
         log.info("Method: {}, Path: {}", method, path);
         log.info("Cookies: {}", request.getCookies().keySet());
+        log.info("All Cookies: {}", request.getCookies());
 
         // 정적 리소스와 공개 경로는 필터 건너뛰기
         if (path.startsWith("/css/") || path.startsWith("/js/") ||
             path.startsWith("/images/") || path.equals("/favicon.ico") ||
             path.equals("/admin/login") || // 로그인 페이지는 필터 건너뛰기
+            path.equals("/admin/logout") || // 로그아웃 페이지는 필터 건너뛰기
             !path.startsWith("/admin/")) {
             log.info("JwtAuthenticationFilter: 필터 건너뛰기 - Path: {}", path);
             return chain.filter(exchange);
@@ -50,6 +52,7 @@ public class JwtAuthenticationFilter implements WebFilter {
 
         // Authorization 헤더 또는 Cookie에서 JWT 토큰 추출
         String token = extractToken(request);
+        log.info("JwtAuthenticationFilter: 토큰 추출 결과 - token={}", token != null ? "존재" : "null");
 
         if (token != null && jwtUtil.validateToken(token)) {
             try {
@@ -74,7 +77,10 @@ public class JwtAuthenticationFilter implements WebFilter {
 
                 // JWT 정보를 request attribute에 저장 (컨트롤러에서 사용)
                 exchange.getAttributes().put("adminId", adminId);
-                exchange.getAttributes().put("companyId", companyId);
+                // companyId가 null일 수 있으므로 null 체크 후 저장
+                if (companyId != null) {
+                    exchange.getAttributes().put("companyId", companyId);
+                }
                 exchange.getAttributes().put("username", username);
                 exchange.getAttributes().put("role", role);
 

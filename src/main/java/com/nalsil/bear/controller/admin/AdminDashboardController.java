@@ -2,8 +2,10 @@ package com.nalsil.bear.controller.admin;
 
 import com.nalsil.bear.dto.response.AdminDashboardResponse;
 import com.nalsil.bear.service.*;
+import com.nalsil.bear.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +32,7 @@ public class AdminDashboardController {
     private final QnaService qnaService;
     private final YoutubeVideoService youtubeVideoService;
     private final ProductService productService;
+    private final JwtUtil jwtUtil;
 
     /**
      * 관리자 대시보드
@@ -113,24 +116,77 @@ public class AdminDashboardController {
     /**
      * 기업 전환 처리
      *
-     * NOTE: JWT 기반 인증에서는 기업 전환을 위해 새로운 JWT 토큰 발급이 필요합니다.
-     * 현재는 기능이 비활성화되어 있으며, 재로그인을 통해 기업을 변경해야 합니다.
+     * 슈퍼관리자가 기업을 선택하면 새로운 JWT 토큰을 발급합니다.
      *
-     * @param companyId 선택한 기업 ID
      * @param exchange ServerWebExchange
      * @return 대시보드로 리다이렉트
      */
     @PostMapping("/switch-company")
-    public Mono<String> switchCompany(@RequestParam Long companyId, ServerWebExchange exchange) {
-        String adminRole = (String) exchange.getAttributes().get("role");
+    public Mono<String> switchCompany(ServerWebExchange exchange) {
+        return exchange.getFormData()
+            .flatMap(formData -> {
+                String companyIdStr = formData.getFirst("companyId");
+                if (companyIdStr == null || companyIdStr.isEmpty()) {
+                    log.error("companyId 파라미터가 누락됨");
+                    return Mono.just("redirect:/admin/select-company?error=invalid_company");
+                }
 
-        // 슈퍼관리자가 아니면 대시보드로 리다이렉트
-        if (!"SUPER_ADMIN".equals(adminRole)) {
-            return Mono.just("redirect:/admin/dashboard");
-        }
+                Long companyId;
+                try {
+                    companyId = Long.parseLong(companyIdStr);
+                } catch (NumberFormatException e) {
+                    log.error("유효하지 않은 companyId 형식: {}", companyIdStr);
+                    return Mono.just("redirect:/admin/select-company?error=invalid_company");
+                }
 
-        // JWT 기반 인증에서는 토큰 재발급이 필요하므로 현재는 지원하지 않음
-        log.warn("기업 전환은 JWT 기반 인증에서 지원하지 않습니다. 재로그인이 필요합니다.");
-        return Mono.just("redirect:/admin/select-company?error=jwt_not_supported");
+                String adminRole = (String) exchange.getAttributes().get("role");
+                Long adminId = (Long) exchange.getAttributes().get("adminId");
+                String username = (String) exchange.getAttributes().get("username");
+
+                log.info("기업 전환 요청: adminId={}, username={}, role={}, companyId={}",
+                        adminId, username, adminRole, companyId);
+
+                // 슈퍼관리자가 아니면 대시보드로 리다이렉트
+                if (!"SUPER_ADMIN".equals(adminRole)) {
+                    log.warn("슈퍼관리자가 아닌 사용자의 기업 전환 시도");
+                    return Mono.just("redirect:/admin/dashboard");
+                }
+
+                // 선택한 기업이 유효한지 확인
+                return companyService.getCompanyById(companyId)
+                        .flatMap(company -> {
+                            if (!company.getIsActive()) {
+                                log.warn("비활성화된 기업 선택 시도: companyId={}", companyId);
+                                return Mono.just("redirect:/admin/select-company?error=inactive_company");
+                            }
+
+                            // 새로운 JWT 토큰 발급 (선택한 companyId 포함)
+                            String newToken = jwtUtil.generateToken(username, adminId, companyId, adminRole);
+
+                            log.info("슈퍼관리자 기업 전환 성공: username={}, companyId={}, companyName={}",
+                                    username, companyId, company.getName());
+
+                            // JWT 토큰을 HTTP-Only Cookie에 저장
+                            ResponseCookie cookie = ResponseCookie.from("JWT-TOKEN", newToken)
+                                    .httpOnly(true)
+                                    .secure(false) // HTTPS에서는 true로 설정
+                                    .path("/")
+                                    .maxAge(24 * 60 * 60) // 24시간
+                                    .sameSite("Lax")
+                                    .build();
+
+                            exchange.getResponse().addCookie(cookie);
+
+                            return Mono.just("redirect:/admin/dashboard");
+                        })
+                        .switchIfEmpty(Mono.defer(() -> {
+                            log.error("유효하지 않은 기업 ID: companyId={}", companyId);
+                            return Mono.just("redirect:/admin/select-company?error=invalid_company");
+                        }))
+                        .onErrorResume(e -> {
+                            log.error("기업 전환 처리 중 오류 발생", e);
+                            return Mono.just("redirect:/admin/select-company?error=system_error");
+                        });
+            });
     }
 }
