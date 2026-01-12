@@ -89,9 +89,9 @@
             <p>궁금한 점을 질문해주세요. 빠른 시일 내에 답변드리겠습니다.</p>
 
             <!-- 에러 메시지 -->
-            <div class="error-message" th:if="${param.error}">
+            <div class="error-message" th:if="${param.error != null and !#lists.isEmpty(param.error)}">
                 <p th:if="${param.error[0] == 'invalid-email'}">올바른 이메일 주소를 입력해주세요.</p>
-                <p th:unless="${param.error[0] == 'invalid-email'}">질문 등록 중 오류가 발생했습니다.</p>
+<p th:unless="${param.error[0] == 'invalid-email'}">질문 등록 중 오류가 발생했습니다.</p>
             </div>
 
             <form th:action="@{/{code}/qna(code=${company.code})}" method="post" id="qna-form">

@@ -10,84 +10,107 @@
     <style>
         .faq-section {
             max-width: 900px;
-            margin: 2rem auto;
+            margin: 0 auto;
             padding: 0 1rem;
         }
+
         .faq-header {
-            margin-bottom: 2rem;
+            text-align: center;
+            margin-bottom: 48px;
         }
+
+        .faq-header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1F2937;
+            margin-bottom: 12px;
+        }
+
+        .faq-header p {
+            font-size: 16px;
+            color: #6B7280;
+        }
+
         .faq-filters {
             display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
+            gap: 12px;
+            margin-bottom: 32px;
             flex-wrap: wrap;
+            align-items: center;
         }
+
         .category-btn {
-            padding: 0.5rem 1rem;
-            border: 1px solid #ddd;
+            padding: 10px 20px;
+            border: 2px solid #E5E7EB;
             background: white;
+            color: #4B5563;
             cursor: pointer;
-            border-radius: 4px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
         }
+
+        .category-btn:hover {
+            background: #F9FAFB;
+            border-color: #D1D5DB;
+            text-decoration: none;
+        }
+
         .category-btn.active {
-            background: #3498db;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border-color: #3498db;
+            border-color: transparent;
         }
+
         .search-box {
             flex: 1;
-            min-width: 200px;
+            min-width: 250px;
+            position: relative;
         }
+
         .search-box input {
             width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        .faq-item {
-            border: 1px solid #e0e0e0;
+            padding: 10px 16px 10px 40px;
+            border: 2px solid #E5E7EB;
             border-radius: 8px;
-            margin-bottom: 1rem;
-            overflow: hidden;
+            font-size: 15px;
+            transition: border-color 0.2s ease;
         }
-        .faq-question {
-            padding: 1.5rem;
-            background: #f8f9fa;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background 0.3s;
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
         }
-        .faq-question:hover {
-            background: #e9ecef;
+
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
         }
-        .faq-question h3 {
-            margin: 0;
-            font-size: 1.1rem;
-            color: #2c3e50;
-        }
-        .faq-toggle {
-            font-size: 1.5rem;
-            color: #7f8c8d;
-            transition: transform 0.3s;
-        }
-        .faq-answer {
-            padding: 1.5rem;
-            display: none;
-            background: white;
-            border-top: 1px solid #e0e0e0;
-        }
-        .faq-item.active .faq-answer {
-            display: block;
-        }
-        .faq-item.active .faq-toggle {
-            transform: rotate(180deg);
-        }
-        .no-results {
-            text-align: center;
-            padding: 3rem;
-            color: #7f8c8d;
+
+        @media (max-width: 768px) {
+            .faq-header h1 {
+                font-size: 28px;
+            }
+
+            .faq-filters {
+                gap: 8px;
+            }
+
+            .category-btn {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+
+            .search-box {
+                width: 100%;
+                order: -1;
+            }
         }
     </style>
 </head>

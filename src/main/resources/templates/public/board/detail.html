@@ -6,6 +6,48 @@
     <title th:text="${post != null ? post.title + ' - ' + (company != null ? company.name : '') : '게시글 상세'}">게시글 상세</title>
     <link rel="stylesheet" th:href="@{/css/common.css}">
     <link rel="stylesheet" th:href="@{/css/public.css}">
+    <style>
+        .post-attachments {
+            padding: 20px;
+            background: #F9FAFB;
+            border-radius: 8px;
+            margin-top: 32px;
+            border: 1px solid #E5E7EB;
+        }
+
+        .post-attachments strong {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 12px;
+        }
+
+        .post-attachments a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: #fff;
+            border: 1px solid #D1D5DB;
+            border-radius: 6px;
+            color: #2563EB;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .post-attachments a:hover {
+            background: #EFF6FF;
+            border-color: #2563EB;
+            text-decoration: none;
+            transform: translateX(4px);
+        }
+
+        .post-attachments a::before {
+            content: '📎';
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
     <!-- 헤더 -->
