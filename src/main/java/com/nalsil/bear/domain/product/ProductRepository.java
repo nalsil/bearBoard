@@ -80,4 +80,15 @@ public interface ProductRepository extends R2dbcRepository<Product, Long> {
      * @return 상품 정보 (Mono<Product>)
      */
     Mono<Product> findByIdAndIsHidden(Long id, Boolean isHidden);
+
+    /**
+     * 기업 ID, 상품 ID, 숨김 여부로 조회
+     * 보안: 해당 기업의 상품인지 검증
+     *
+     * @param companyId 기업 ID
+     * @param id 상품 ID
+     * @param isHidden 숨김 여부
+     * @return 상품 정보 (Mono<Product>)
+     */
+    Mono<Product> findByCompanyIdAndIdAndIsHidden(Long companyId, Long id, Boolean isHidden);
 }

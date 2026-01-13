@@ -89,3 +89,35 @@ src/main/resources/
 
 ### Actuator Endpoints
 Spring Boot Actuator is enabled for monitoring and management. Endpoints are available at `/actuator/*` and should be properly secured in production.
+
+## Performance Testing
+
+### k6 Load & Stress Testing
+The `k6/` directory contains comprehensive performance testing scripts for public endpoints:
+
+```bash
+# Quick start - basic functionality check
+cd k6
+./run-tests.sh smoke
+
+# Load testing - normal traffic simulation
+./run-tests.sh load
+
+# See k6/QUICK_START.md for detailed instructions
+```
+
+**Available Tests**:
+- **Smoke Test**: Basic functionality verification (1 VU, 1 min)
+- **Load Test**: Normal load performance testing (10-50 VU, 10 min)
+- **Stress Test**: System limits and recovery testing (50-200 VU, 14 min)
+- **Spike Test**: Sudden traffic spike handling (10-500 VU, 7 min)
+
+**Documentation**:
+- Quick Start: `k6/QUICK_START.md`
+- Full Guide: `k6/README.md`
+- Configuration: `k6/config.js`
+
+**Prerequisites**:
+- k6 installed (`brew install k6` or `choco install k6`)
+- Application running on port 8080
+- Test data in database (company, products, boards, posts)

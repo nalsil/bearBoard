@@ -2,6 +2,7 @@ package com.nalsil.bear.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.config.CorsRegistry;
+import org.springframework.web.reactive.config.PathMatchConfigurer;
 import org.springframework.web.reactive.config.ResourceHandlerRegistry;
 import org.springframework.web.reactive.config.ViewResolverRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
@@ -21,6 +22,18 @@ public class WebFluxConfig implements WebFluxConfigurer {
 
     public WebFluxConfig(ThymeleafReactiveViewResolver thymeleafReactiveViewResolver) {
         this.thymeleafReactiveViewResolver = thymeleafReactiveViewResolver;
+    }
+
+    /**
+     * 경로 매칭 설정
+     * Trailing slash(/) 자동 매칭 활성화
+     * 예: /company-a 와 /company-a/ 모두 동일하게 처리
+     *
+     * @param configurer PathMatchConfigurer
+     */
+    @Override
+    public void configurePathMatching(PathMatchConfigurer configurer) {
+        configurer.setUseTrailingSlashMatch(true);
     }
 
     /**

@@ -20,7 +20,8 @@
 
             <!-- 상품 목록 -->
             <div class="product-grid" th:if="${products != null and !products.isEmpty()}">
-                <div class="product-card" th:each="product : ${products}">
+                <a th:href="@{/{code}/products/{id}(code=${company.code},id=${product.id})}"
+                   class="product-card" th:each="product : ${products}">
                     <div class="product-image">
                         <img th:if="${product.imageUrl}" th:src="${product.imageUrl}" th:alt="${product.name}">
                         <div th:unless="${product.imageUrl}" class="product-image-placeholder">이미지 없음</div>
@@ -31,7 +32,7 @@
                         <p class="product-description" th:if="${product.description}" th:text="${product.description}">설명</p>
                         <p class="product-price" th:if="${product.price}" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '원'">가격</p>
                     </div>
-                </div>
+                </a>
             </div>
 
             <!-- 상품 없음 -->

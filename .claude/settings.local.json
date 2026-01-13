@@ -38,7 +38,9 @@
       "mcp__playwright__browser_wait_for",
       "Bash(find:*)",
       "Bash(tee:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(chmod:*)",
+      "Bash(tree:*)"
     ]
   }
 }

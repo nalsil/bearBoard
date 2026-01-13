@@ -122,6 +122,30 @@ public class ProductService {
     }
 
     /**
+     * 기업 ID, 상품 ID, 숨김 여부로 조회
+     * 보안: 해당 기업의 상품인지 검증
+     *
+     * @param companyId 기업 ID
+     * @param id 상품 ID
+     * @param isHidden 숨김 여부
+     * @return 상품 정보 (Mono<Product>)
+     */
+    public Mono<Product> getProductByCompanyIdAndIdAndIsHidden(Long companyId, Long id, Boolean isHidden) {
+        log.debug("Fetching product by company ID: {}, product ID: {}, isHidden: {}", companyId, id, isHidden);
+
+        return productRepository.findByCompanyIdAndIdAndIsHidden(companyId, id, isHidden)
+                .doOnSuccess(product -> {
+                    if (product != null) {
+                        log.info("Found product: {} (ID: {}) for company ID: {}", product.getName(), id, companyId);
+                    } else {
+                        log.warn("Product not found for company ID: {}, product ID: {}, isHidden: {}", companyId, id, isHidden);
+                    }
+                })
+                .doOnError(error -> log.error("Failed to fetch product by company ID: {}, product ID: {}, isHidden: {}",
+                        companyId, id, isHidden, error));
+    }
+
+    /**
      * 상품 ID로 조회
      *
      * @param id 상품 ID

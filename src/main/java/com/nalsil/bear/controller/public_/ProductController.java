@@ -129,21 +129,20 @@ public class ProductController {
 
         log.info("Accessing product detail for company: {}, productId: {}", companyCode, productId);
 
-        // 기업 정보 조회
-        Mono<Company> companyMono = companyService.getActiveCompanyByCode(companyCode);
-
-        return companyMono.flatMap(company ->
-                // 제품 조회 (숨김 제외)
-                productService.getProductByIdAndIsHidden(productId, false)
-                        .map(product -> Rendering.view("public/product/detail")
-                                .modelAttribute("company", company)
-                                .modelAttribute("product", product)
-                                .build())
-                        .switchIfEmpty(Mono.just(Rendering.view("public/product/detail")
-                                .modelAttribute("company", company)
-                                .modelAttribute("product", null)
-                                .modelAttribute("message", "해당 제품을 찾을 수 없습니다.")
-                                .build()))
-        ).contextWrite(ctx -> TenantContextHolder.setCurrentTenant(ctx, companyCode));
+        return companyService.getActiveCompanyByCode(companyCode)
+                .flatMap(company ->
+                        // 제품 조회 (해당 기업의 제품인지 검증, 숨김 제외)
+                        productService.getProductByCompanyIdAndIdAndIsHidden(company.getId(), productId, false)
+                                .map(product -> Rendering.view("public/product/detail")
+                                        .modelAttribute("company", company)
+                                        .modelAttribute("product", product)
+                                        .build())
+                                .switchIfEmpty(Mono.just(Rendering.view("public/product/detail")
+                                        .modelAttribute("company", company)
+                                        .modelAttribute("product", null)
+                                        .modelAttribute("message", "해당 제품을 찾을 수 없습니다.")
+                                        .build()))
+                )
+                .contextWrite(ctx -> TenantContextHolder.setCurrentTenant(ctx, companyCode));
     }
 }
