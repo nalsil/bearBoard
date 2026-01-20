@@ -1,0 +1,11 @@
+# JMeter 결과 파일
+results/
+*.jtl
+*.csv
+
+# JMeter 로그
+jmeter.log
+
+# 임시 파일
+*.tmp
+*.bak
