@@ -7,91 +7,197 @@
     <title th:text="${company != null ? company.name + ' - QnA' : 'QnA'}">QnA</title>
     <link rel="stylesheet" th:href="@{/css/common.css}">
     <link rel="stylesheet" th:href="@{/css/public.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        .qna-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 80px 0;
+            text-align: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .qna-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            animation: rotate 30s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .qna-hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .qna-hero h1 {
+            font-size: clamp(36px, 6vw, 56px);
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .qna-hero p {
+            font-size: 18px;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
         .qna-section {
             max-width: 900px;
-            margin: 0 auto;
-            padding: 0 1rem;
+            margin: -60px auto 0;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
         }
 
         .qna-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 48px;
+            align-items: center;
+            background: #fff;
+            padding: 24px 32px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 32px;
             gap: 20px;
+            flex-wrap: wrap;
         }
 
-        .qna-header h1 {
-            font-size: 36px;
-            font-weight: 700;
+        .qna-header-info h2 {
+            font-size: 24px;
+            font-weight: 800;
             color: #1F2937;
             margin-bottom: 8px;
         }
 
-        .qna-header p {
-            font-size: 16px;
+        .qna-header-info p {
+            font-size: 14px;
             color: #6B7280;
         }
 
         .btn-ask {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 12px 24px;
+            padding: 14px 32px;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             text-decoration: none;
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 16px;
             white-space: nowrap;
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-ask:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
-            text-decoration: none;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #D1FAE5 0%, #10B981 100%);
+            color: #065F46;
+            padding: 20px 24px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .success-message i {
+            font-size: 24px;
+        }
+
+        .qna-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
 
         .qna-item {
-            border: 1px solid #E5E7EB;
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 16px;
-            background: white;
-            transition: all 0.3s ease;
+            background: #fff;
+            border: 2px solid #E5E7EB;
+            border-radius: 16px;
+            padding: 28px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .qna-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .qna-item:hover {
-            border-color: #D1D5DB;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            transform: translateY(-2px);
+            border-color: #667eea;
+            box-shadow: 0 12px 32px rgba(102, 126, 234, 0.15);
+            transform: translateX(8px);
+        }
+
+        .qna-item:hover::before {
+            opacity: 1;
+        }
+
+        .qna-item.answered {
+            border-color: #D1FAE5;
+        }
+
+        .qna-item.answered:hover {
+            box-shadow: 0 12px 32px rgba(16, 185, 129, 0.15);
         }
 
         .qna-status {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            border-radius: 25px;
             font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 12px;
+            font-weight: 700;
+            margin-bottom: 16px;
         }
 
         .qna-status.answered {
-            background: #D1FAE5;
+            background: linear-gradient(135deg, #D1FAE5 0%, #10B981 100%);
             color: #065F46;
         }
 
         .qna-status.pending {
-            background: #FEF3C7;
+            background: linear-gradient(135deg, #FEF3C7 0%, #F59E0B 100%);
             color: #92400E;
         }
 
         .qna-title {
             font-size: 18px;
-            font-weight: 600;
-            margin: 8px 0 12px;
+            font-weight: 700;
+            margin: 8px 0 16px;
             color: #1F2937;
             line-height: 1.5;
         }
@@ -99,6 +205,14 @@
         .qna-meta {
             color: #9CA3AF;
             font-size: 14px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .qna-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .qna-link {
@@ -107,33 +221,96 @@
             display: block;
         }
 
-        .qna-link:hover .qna-title {
-            color: #2563EB;
+        .no-results {
+            text-align: center;
+            padding: 100px 40px;
+            background: #fff;
+            border-radius: 20px;
         }
 
-        .success-message {
-            background: #D1FAE5;
-            color: #065F46;
-            padding: 16px 20px;
-            border-radius: 8px;
+        .no-results i {
+            font-size: 80px;
+            color: #D1D5DB;
             margin-bottom: 24px;
-            border-left: 4px solid #10B981;
-            font-weight: 500;
+        }
+
+        .no-results h3 {
+            font-size: 24px;
+            color: #1F2937;
+            margin-bottom: 12px;
+        }
+
+        .no-results p {
+            font-size: 16px;
+            color: #6B7280;
+            margin-bottom: 32px;
+            line-height: 1.8;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 60px;
+        }
+
+        .page-link {
+            width: 44px;
+            height: 44px;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            color: #4B5563;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .page-link:hover:not(.disabled) {
+            background-color: #F9FAFB;
+            border-color: #D1D5DB;
+            transform: translateY(-2px);
+        }
+
+        .page-link.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .page-link.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+            cursor: not-allowed;
         }
 
         @media (max-width: 768px) {
+            .qna-hero {
+                padding: 60px 0;
+            }
+
+            .qna-section {
+                margin-top: -40px;
+            }
+
             .qna-header {
                 flex-direction: column;
                 align-items: stretch;
+                padding: 20px;
             }
 
-            .qna-header h1 {
-                font-size: 28px;
+            .qna-header-info h2 {
+                font-size: 20px;
             }
 
             .btn-ask {
                 width: 100%;
-                text-align: center;
+                justify-content: center;
             }
 
             .qna-item {
@@ -142,6 +319,23 @@
 
             .qna-title {
                 font-size: 16px;
+            }
+
+            .qna-meta {
+                flex-wrap: wrap;
+                gap: 12px;
+                font-size: 13px;
+            }
+
+            .pagination {
+                gap: 4px;
+            }
+
+            .page-link {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+                min-width: 36px;
             }
         }
     </style>
@@ -152,55 +346,92 @@
 
     <!-- 메인 컨텐츠 -->
     <main class="main-content">
-        <div class="qna-section">
-            <div class="qna-header">
-                <div>
+        <!-- 히어로 섹션 -->
+        <div class="qna-hero">
+            <div class="container">
+                <div class="qna-hero-content">
                     <h1>Q&A</h1>
-                    <p>궁금한 점을 질문하고 답변을 확인하세요.</p>
+                    <p>궁금한 점을 자유롭게 질문하세요. 빠른 시일 내에 답변드리겠습니다.</p>
                 </div>
-                <a th:href="@{/{code}/qna/new(code=${company.code})}" class="btn-ask">질문하기</a>
+            </div>
+        </div>
+
+        <!-- QnA 섹션 -->
+        <div class="qna-section">
+            <!-- 헤더 -->
+            <div class="qna-header">
+                <div class="qna-header-info">
+                    <h2>문의 내역</h2>
+                    <p>총 <strong th:text="${totalQnas != null ? totalQnas : 0}">0</strong>개의 문의가 있습니다</p>
+                </div>
+                <a th:href="@{/{code}/qna/new(code=${company.code})}" class="btn-ask">
+                    <i class="fas fa-plus"></i> 질문하기
+                </a>
             </div>
 
             <!-- 성공 메시지 -->
             <div class="success-message" th:if="${param.success}">
-                질문이 성공적으로 등록되었습니다. 답변을 기다려주세요.
+                <i class="fas fa-check-circle"></i>
+                <div>
+                    <strong>질문이 등록되었습니다!</strong><br>
+                    답변 준비가 완료되면 알림을 보내드립니다.
+                </div>
             </div>
 
             <!-- QnA 목록 -->
-            <div class="qna-list" th:if="${qnas != null and !qnas.isEmpty()}">
-                <div class="qna-item" th:each="qna : ${qnas}">
-                    <a th:href="@{/{code}/qna/{id}(code=${company.code}, id=${qna.id})}" class="qna-link">
-                        <span class="qna-status" th:classappend="${qna.isAnswered ? 'answered' : 'pending'}"
-                              th:text="${qna.isAnswered ? '답변완료' : '답변대기'}">상태</span>
-                        <h3 class="qna-title" th:text="${qna.questionTitle}">질문 제목</h3>
-                        <div class="qna-meta">
+             <div class="qna-list" th:if="${qnas != null and !qnas.isEmpty()}">
+                  <a th:each="qna : ${qnas}"
+                     th:href="@{/{code}/qna/{id}(code=${company.code}, id=${qna.id})}"
+                     class="qna-link"
+                     th:classappend="${qna.isAnswered ? 'answered' : ''}">
+                    <span class="qna-status" th:classappend="${qna.isAnswered ? 'answered' : 'pending'}">
+                        <i th:class="${qna.isAnswered ? 'fas fa-check-circle' : 'fas fa-clock'}"></i>
+                        <span th:text="${qna.isAnswered ? '답변완료' : '답변대기'}">상태</span>
+                    </span>
+                    <h3 class="qna-title" th:text="${qna.questionTitle}">질문 제목</h3>
+                    <div class="qna-meta">
+                        <span>
+                            <i class="fas fa-calendar-alt"></i>
                             <span th:text="${#temporals.format(qna.createdAt, 'yyyy-MM-dd HH:mm')}">작성일</span>
-                        </div>
-                    </a>
+                        </span>
+                        <span th:if="${qna.answeredAt != null and qna.isAnswered}">
+                            <i class="fas fa-reply"></i>
+                            <span th:text="${#temporals.format(qna.answeredAt, 'yyyy-MM-dd HH:mm')}">답변일</span>
+                        </span>
+                    </div>
+                </a>
                 </div>
             </div>
 
             <!-- 결과 없음 -->
             <div class="no-results" th:if="${qnas == null or qnas.isEmpty()}">
-                <p>등록된 질문이 없습니다.</p>
-                <a th:href="@{/{code}/qna/new(code=${company.code})}" class="btn-ask">첫 질문하기</a>
+                <i class="fas fa-comments"></i>
+                <h3>등록된 질문이 없습니다</h3>
+                <p>아직 등록된 질문이 없습니다. 가장 먼저 질문을 등록해보세요!<br>빠르고 친절하게 답변드리겠습니다.</p>
+                <a th:href="@{/{code}/qna/new(code=${company.code})}" class="btn-ask">
+                    <i class="fas fa-pen"></i> 첫 질문하기
+                </a>
             </div>
 
-            <!-- 페이징 -->
+            <!-- 페이지네이션 -->
             <div class="pagination" th:if="${totalPages > 1}">
                 <a th:if="${currentPage > 0}"
                    th:href="@{/{code}/qna(code=${company.code}, page=${currentPage - 1}, size=${pageSize})}"
-                   class="page-btn">이전</a>
+                   class="page-link" aria-label="이전 페이지">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
 
                 <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
                     <a th:href="@{/{code}/qna(code=${company.code}, page=${i}, size=${pageSize})}"
-                       th:class="${i == currentPage ? 'page-btn active' : 'page-btn'}"
-                       th:text="${i + 1}">1</a>
+                       th:text="${i + 1}"
+                       th:class="${i == currentPage ? 'page-link active' : 'page-link'}">1</a>
                 </span>
 
                 <a th:if="${currentPage < totalPages - 1}"
                    th:href="@{/{code}/qna(code=${company.code}, page=${currentPage + 1}, size=${pageSize})}"
-                   class="page-btn">다음</a>
+                   class="page-link" aria-label="다음 페이지">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
             </div>
         </div>
     </main>

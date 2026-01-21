@@ -55,6 +55,12 @@ public class Post {
     private Integer viewCount;
 
     /**
+     * 새 글 여부 (isNew)
+     */
+    @Column("is_new")
+    private Boolean isNew;
+
+    /**
      * 첨부 파일 경로
      */
     @Column("file_path")

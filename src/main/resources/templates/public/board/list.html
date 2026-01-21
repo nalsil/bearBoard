@@ -6,6 +6,265 @@
     <title th:text="${board != null ? board.name + ' - ' + (company != null ? company.name : '') : '게시판'}">게시판</title>
     <link rel="stylesheet" th:href="@{/css/common.css}">
     <link rel="stylesheet" th:href="@{/css/public.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .board-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 80px 0;
+            text-align: center;
+            color: #fff;
+            margin-bottom: 60px;
+        }
+
+        .board-hero h1 {
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: 800;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .board-hero p {
+            font-size: 18px;
+            opacity: 0.95;
+        }
+
+        .board-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .board-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1F2937;
+            margin: 0;
+        }
+
+        .board-stats {
+            display: flex;
+            gap: 20px;
+            color: #6B7280;
+            font-size: 14px;
+        }
+
+        .board-stats span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .board-list {
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .post-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+            background: #fff;
+        }
+
+        .post-table thead {
+            background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+        }
+
+        .post-table th {
+            padding: 20px 16px;
+            text-align: left;
+            border-bottom: 2px solid #E5E7EB;
+            font-weight: 700;
+            color: #374151;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .post-table td {
+            padding: 20px 16px;
+            text-align: left;
+            border-bottom: 1px solid #F3F4F6;
+        }
+
+        .post-table tbody tr {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .post-table tbody tr:hover {
+            background-color: #F0F4FF;
+            transform: scale(1.01);
+        }
+
+        .post-table .col-number {
+            width: 80px;
+            text-align: center;
+            color: #9CA3AF;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .post-table .col-author {
+            width: 140px;
+            color: #6B7280;
+        }
+
+        .post-table .col-date {
+            width: 140px;
+            color: #9CA3AF;
+            font-size: 14px;
+        }
+
+        .post-table .col-views {
+            width: 80px;
+            text-align: center;
+            color: #9CA3AF;
+            font-size: 14px;
+        }
+
+        .title-cell {
+            position: relative;
+        }
+
+        .title-cell a {
+            color: #1F2937;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: block;
+            line-height: 1.5;
+        }
+
+        .title-cell a:hover {
+            color: #667eea;
+            transform: translateX(4px);
+        }
+
+        .title-cell .new-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+            color: #fff;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 100px 20px;
+            background: #fff;
+            border-radius: 20px;
+        }
+
+        .empty-state i {
+            font-size: 80px;
+            color: #D1D5DB;
+            margin-bottom: 24px;
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            color: #1F2937;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            color: #6B7280;
+            margin-bottom: 24px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 40px;
+        }
+
+        .page-link {
+            width: 44px;
+            height: 44px;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            color: #4B5563;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .page-link:hover:not(.disabled) {
+            background-color: #F9FAFB;
+            border-color: #D1D5DB;
+            transform: translateY(-2px);
+        }
+
+        .page-link.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .page-link.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .board-hero {
+                padding: 60px 0;
+            }
+
+            .board-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .board-title {
+                font-size: 24px;
+            }
+
+            .post-table {
+                font-size: 14px;
+            }
+
+            .post-table th,
+            .post-table td {
+                padding: 16px 12px;
+            }
+
+            .post-table .col-author,
+            .post-table .col-date,
+            .post-table .col-views {
+                display: none;
+            }
+
+            .pagination {
+                gap: 4px;
+            }
+
+            .page-link {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+                min-width: 36px;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- 헤더 -->
@@ -13,10 +272,23 @@
 
     <!-- 메인 컨텐츠 -->
     <main class="main-content">
+        <!-- 히어로 섹션 -->
+        <div class="board-hero" th:if="${board != null}">
+            <div class="container">
+                <h1 th:text="${board.name}">게시판</h1>
+                <p>최신 소식과 정보를 확인하세요</p>
+            </div>
+        </div>
+
         <div class="container">
-            <header class="page-header">
-                <h1 th:text="${board != null ? board.name : '게시판'}">게시판</h1>
-            </header>
+            <!-- 게시판 헤더 -->
+            <div class="board-header" th:if="${board != null}">
+                <h2 class="board-title" th:text="${board.name}">게시판</h2>
+                <div class="board-stats">
+                    <span><i class="fas fa-file-alt"></i> 총 <strong th:text="${totalPosts != null ? totalPosts : 0}">0</strong>개</span>
+                    <span th:if="${currentPage != null}"><i class="fas fa-layer-group"></i> <strong th:text="${currentPage + 1}">1</strong>페이지</span>
+                </div>
+            </div>
 
             <!-- 게시글 목록 -->
             <div class="board-list" th:if="${posts != null and !posts.isEmpty()}">
@@ -27,15 +299,16 @@
                             <th class="col-title">제목</th>
                             <th class="col-author">작성자</th>
                             <th class="col-date">작성일</th>
-                            <th class="col-views">조회수</th>
+                            <th class="col-views">조회</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="post, stat : ${posts}">
+                        <tr th:each="post, stat : ${posts}" th:onclick="'location.href=\'' + @{/{code}/board/{type}/{id}(code=${company.code},type=${board.type},id=${post.id})} + '\''">
                             <td th:text="${totalPosts - (currentPage * 10 + stat.index)}">번호</td>
                             <td class="title-cell">
                                 <a th:href="@{/{code}/board/{type}/{id}(code=${company.code},type=${board.type},id=${post.id})}"
-                                   th:text="${post.title}">제목</a>
+                                    th:text="${post.title}"
+                                    onclick="event.stopPropagation()">제목</a>
                             </td>
                             <td th:text="${post.author}">작성자</td>
                             <td th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd')}">작성일</td>
@@ -43,30 +316,41 @@
                         </tr>
                     </tbody>
                 </table>
-
-                <!-- 페이지네이션 -->
-                <nav class="pagination" th:if="${totalPages > 1}">
-                    <a th:href="@{/{code}/board/{type}(code=${company.code},type=${board.type},page=${currentPage - 1})}"
-                       th:classappend="${currentPage == 0 ? 'disabled' : ''}"
-                       class="page-link">이전</a>
-
-                    <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-                        <a th:href="@{/{code}/board/{type}(code=${company.code},type=${board.type},page=${i})}"
-                           th:text="${i + 1}"
-                           th:classappend="${i == currentPage ? 'active' : ''}"
-                           class="page-link">페이지</a>
-                    </span>
-
-                    <a th:href="@{/{code}/board/{type}(code=${company.code},type=${board.type},page=${currentPage + 1})}"
-                       th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}"
-                       class="page-link">다음</a>
-                </nav>
             </div>
 
             <!-- 게시글 없음 -->
-            <div class="empty-message" th:if="${posts == null or posts.isEmpty()}">
-                <p th:text="${message != null ? message : '등록된 게시글이 없습니다.'}">게시글이 없습니다</p>
+            <div class="empty-state" th:if="${posts == null or posts.isEmpty()}">
+                <i class="fas fa-inbox"></i>
+                <h3 th:text="${message != null ? message : '등록된 게시글이 없습니다.'}">게시글이 없습니다</h3>
+                <p>아직 등록된 게시글이 없습니다. 가장 먼저 게시글을 작성해보세요!</p>
+                <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+                    <a th:href="@{/{code}(code=${company.code})}" class="btn btn-secondary">
+                        <i class="fas fa-home"></i> 홈으로
+                    </a>
+                </div>
             </div>
+
+            <!-- 페이지네이션 -->
+            <nav class="pagination" th:if="${totalPages > 1}">
+                <a th:href="@{/{code}/board/{type}(code=${company.code},type=${board.type},page=${currentPage - 1})}"
+                   th:classappend="${currentPage == 0 ? 'disabled' : ''}"
+                   class="page-link" aria-label="이전 페이지">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+
+                <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                    <a th:href="@{/{code}/board/{type}(code=${company.code},type=${board.type},page=${i})}"
+                       th:text="${i + 1}"
+                       th:classappend="${i == currentPage ? 'active' : ''}"
+                       class="page-link">페이지</a>
+                </span>
+
+                <a th:href="@{/{code}/board/{type}(code=${company.code},type=${board.type},page=${currentPage + 1})}"
+                   th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}"
+                   class="page-link" aria-label="다음 페이지">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </nav>
         </div>
     </main>
 

@@ -40,7 +40,9 @@
       "Bash(tee:*)",
       "WebSearch",
       "Bash(chmod:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(psql:*)",
+      "Bash(where:*)"
     ]
   }
 }

@@ -7,63 +7,287 @@
     <title th:text="${company != null ? company.name + ' - QnA 상세' : 'QnA 상세'}">QnA 상세</title>
     <link rel="stylesheet" th:href="@{/css/common.css}">
     <link rel="stylesheet" th:href="@{/css/public.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        .detail-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 60px 0;
+            text-align: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .detail-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            animation: rotate 30s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .detail-hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .detail-hero h1 {
+            font-size: clamp(24px, 4vw, 32px);
+            font-weight: 800;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .detail-hero p {
+            font-size: 16px;
+            opacity: 0.95;
+        }
+
         .detail-section {
             max-width: 900px;
-            margin: 2rem auto;
-            padding: 0 1rem;
+            margin: -60px auto 0;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
         }
+
+        .detail-card {
+            background: #fff;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
         .detail-header {
-            margin-bottom: 2rem;
+            padding: 40px;
+            border-bottom: 2px solid #E5E7EB;
+            background: linear-gradient(180deg, #F9FAFB 0%, #fff 100%);
         }
-        .qna-status {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
-            font-size: 0.875rem;
-            margin-bottom: 1rem;
+
+        .detail-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
         }
-        .qna-status.answered {
-            background: #d4edda;
-            color: #155724;
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 700;
         }
-        .qna-status.pending {
-            background: #fff3cd;
-            color: #856404;
+
+        .status-badge.answered {
+            background: linear-gradient(135deg, #D1FAE5 0%, #10B981 100%);
+            color: #065F46;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
         }
+
+        .status-badge.pending {
+            background: linear-gradient(135deg, #FEF3C7 0%, #F59E0B 100%);
+            color: #92400E;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+        }
+
+        .status-badge i {
+            font-size: 20px;
+        }
+
+        .detail-meta {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            color: #6B7280;
+            font-size: 14px;
+        }
+
+        .detail-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .question-title {
+            font-size: clamp(24px, 4vw, 32px);
+            font-weight: 800;
+            color: #1F2937;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .detail-body {
+            padding: 40px;
+        }
+
         .qna-question,
         .qna-answer {
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 2rem;
-            margin-bottom: 2rem;
+            margin-bottom: 40px;
         }
-        .qna-question h2,
-        .qna-answer h3 {
-            margin-top: 0;
-            color: #2c3e50;
+
+        .qna-question:last-child,
+        .qna-answer:last-child {
+            margin-bottom: 0;
         }
-        .qna-meta {
-            color: #7f8c8d;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
+
+        .qna-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+            color: #9CA3AF;
         }
-        .qna-body {
+
+        .qna-label i {
+            font-size: 24px;
+        }
+
+        .qna-label.question {
+            color: #667eea;
+        }
+
+        .qna-label.answer {
+            color: #10B981;
+        }
+
+        .qna-content {
+            background: #F9FAFB;
+            border-radius: 16px;
+            padding: 32px;
+            border: 2px solid #E5E7EB;
+            line-height: 1.9;
+            color: #374151;
+            font-size: 16px;
+            white-space: pre-wrap;
+        }
+
+        .pending-message {
+            text-align: center;
+            padding: 60px 40px;
+            background: linear-gradient(135deg, #FEF3C715 0%, #F59E0B15 100%);
+            border-radius: 16px;
+            color: #92400E;
+        }
+
+        .pending-message i {
+            font-size: 64px;
+            margin-bottom: 24px;
+        }
+
+        .pending-message h3 {
+            font-size: 24px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .pending-message p {
+            font-size: 16px;
             line-height: 1.8;
-            color: #34495e;
+            margin-bottom: 24px;
         }
+
+        .detail-footer {
+            padding: 32px 40px;
+            border-top: 2px solid #E5E7EB;
+            text-align: center;
+        }
+
         .btn-back {
-            background: #95a5a6;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 4px;
+            padding: 16px 40px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
             text-decoration: none;
-            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
+
         .btn-back:hover {
-            background: #7f8c8d;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 100px 40px;
+            background: #fff;
+            border-radius: 20px;
+        }
+
+        .error-message i {
+            font-size: 80px;
+            color: #D1D5DB;
+            margin-bottom: 24px;
+        }
+
+        .error-message h3 {
+            font-size: 24px;
+            color: #1F2937;
+            margin-bottom: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .detail-hero {
+                padding: 40px 0;
+            }
+
+            .detail-section {
+                margin-top: -40px;
+            }
+
+            .detail-header {
+                padding: 28px 24px;
+            }
+
+            .detail-header-top {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .question-title {
+                font-size: 24px;
+            }
+
+            .detail-body {
+                padding: 28px 24px;
+            }
+
+            .qna-content {
+                padding: 24px 20px;
+                font-size: 15px;
+            }
+
+            .detail-footer {
+                padding: 24px;
+            }
+
+            .btn-back {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -73,43 +297,91 @@
 
     <!-- 메인 컨텐츠 -->
     <main class="main-content">
+        <!-- 히어로 섹션 -->
+        <div class="detail-hero" th:if="${qna != null}">
+            <div class="container">
+                <div class="detail-hero-content">
+                    <h1>Q&A 상세</h1>
+                    <p th:text="'작성일: ' + ${#temporals.format(qna.createdAt, 'yyyy년 MM월 dd일 HH:mm')}">작성일</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 상세 섹션 -->
         <div class="detail-section" th:if="${qna != null}">
-            <div class="detail-header">
-                <span class="qna-status" th:classappend="${qna.isAnswered ? 'answered' : 'pending'}"
-                      th:text="${qna.isAnswered ? '답변완료' : '답변대기'}">상태</span>
-                <h1 th:text="${qna.questionTitle}">질문 제목</h1>
-                <div class="qna-meta">
-                    <span>작성일: <span th:text="${#temporals.format(qna.createdAt, 'yyyy-MM-dd HH:mm')}">작성일</span></span>
+            <div class="detail-card">
+                <!-- 헤더 -->
+                <div class="detail-header">
+                    <div class="detail-header-top">
+                        <span class="status-badge" th:classappend="${qna.isAnswered ? 'answered' : 'pending'}">
+                            <i th:class="${qna.isAnswered ? 'fas fa-check-circle' : 'fas fa-clock'}"></i>
+                            <span th:text="${qna.isAnswered ? '답변완료' : '답변대기'}">상태</span>
+                        </span>
+                        <div class="detail-meta">
+                            <span th:if="${qna.answeredAt != null and qna.isAnswered}">
+                                <i class="fas fa-reply"></i>
+                                답변일: <span th:text="${#temporals.format(qna.answeredAt, 'yyyy-MM-dd HH:mm')}">답변일</span>
+                            </span>
+                            <span th:if="${qna.createdAt != null}">
+                                <i class="fas fa-calendar-alt"></i>
+                                질문일: <span th:text="${#temporals.format(qna.createdAt, 'yyyy-MM-dd HH:mm')}">질문일</span>
+                            </span>
+                        </div>
+                    </div>
+                    <h2 class="question-title" th:text="${qna.questionTitle}">질문 제목</h2>
+                </div>
+
+                <!-- 본문 -->
+                <div class="detail-body">
+                    <!-- 질문 -->
+                    <div class="qna-question">
+                        <div class="qna-label question">
+                            <i class="fas fa-question-circle"></i>
+                            질문
+                        </div>
+                        <div class="qna-content" th:text="${qna.questionBody}">질문 내용</div>
+                    </div>
+
+                    <!-- 답변 -->
+                    <div class="qna-answer" th:if="${qna.isAnswered and qna.answerBody != null}">
+                        <div class="qna-label answer">
+                            <i class="fas fa-comment-dots"></i>
+                            답변
+                        </div>
+                        <div class="qna-content" th:text="${qna.answerBody}">답변 내용</div>
+                    </div>
+
+                    <!-- 답변 대기 -->
+                    <div class="pending-message" th:unless="${qna.isAnswered}">
+                        <i class="fas fa-hourglass-half"></i>
+                        <h3>답변을 준비 중입니다</h3>
+                        <p>
+                            담당자가 현재 답변을 준비 중입니다.<br>
+                            평일 기준 영업일 24시간 이내에 답변드리고 있으니,<br>
+                            잠시만 기다려 주시면 감사하겠습니다.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 푸터 -->
+                <div class="detail-footer">
+                    <a th:href="@{/{code}/qna(code=${company.code})}" class="btn-back">
+                        <i class="fas fa-list"></i>
+                        목록으로
+                    </a>
                 </div>
             </div>
+        </div>
 
-            <!-- 질문 -->
-            <div class="qna-question">
-                <h2>질문</h2>
-                <div class="qna-body" th:text="${qna.questionBody}">질문 내용</div>
-            </div>
-
-            <!-- 답변 -->
-            <div class="qna-answer" th:if="${qna.isAnswered and qna.answerBody != null}">
-                <h3>답변</h3>
-                <div class="qna-meta">
-                    <span th:if="${qna.answeredAt}">
-                        답변일: <span th:text="${#temporals.format(qna.answeredAt, 'yyyy-MM-dd HH:mm')}">답변일</span>
-                    </span>
-                </div>
-                <div class="qna-body" th:text="${qna.answerBody}">답변 내용</div>
-            </div>
-
-            <!-- 답변 대기 -->
-            <div class="qna-answer" th:unless="${qna.isAnswered}">
-                <p style="text-align: center; color: #7f8c8d; padding: 2rem;">
-                    답변을 준비 중입니다. 빠른 시일 내에 답변드리겠습니다.
-                </p>
-            </div>
-
-            <div style="margin-top: 2rem;">
-                <a th:href="@{/{code}/qna(code=${company.code})}" class="btn-back">목록으로</a>
-            </div>
+        <!-- 오류 메시지 -->
+        <div class="error-message" th:unless="${qna != null}">
+            <i class="fas fa-exclamation-circle"></i>
+            <h3>질문을 찾을 수 없습니다</h3>
+            <p th:text="${message != null ? message : '요청하신 질문을 찾을 수 없습니다.'}">질문을 찾을 수 없습니다</p>
+            <a th:href="@{/{code}/qna(code=${company.code})}" class="btn-back">
+                <i class="fas fa-list"></i>
+                목록으로
+            </a>
         </div>
     </main>
 

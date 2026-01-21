@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS post (
     content TEXT NOT NULL,
     author VARCHAR(100) NOT NULL,
     view_count INTEGER DEFAULT 0,
+    is_new BOOLEAN DEFAULT FALSE,
     file_path VARCHAR(500),
     is_hidden BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT NOW(),

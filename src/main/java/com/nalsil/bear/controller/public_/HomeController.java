@@ -91,15 +91,16 @@ public class HomeController {
                     )
             )
     })
-    @GetMapping("/about")
-    public Mono<Rendering> about(@PathVariable String companyCode) {
-        log.info("Accessing about page for company: {}", companyCode);
-
-        return companyService.getActiveCompanyByCode(companyCode)
-                .map(company -> Rendering.view("public/about")
-                        .modelAttribute("company", company)
-                        .build())
-                .contextWrite(ctx -> TenantContextHolder.setCurrentTenant(ctx, companyCode));
-    }
+	@GetMapping("/about")
+	public Mono<Rendering> about(@PathVariable String companyCode) {
+		log.info("Accessing about page for company: {}", companyCode);
+		
+		return companyService.getActiveCompanyByCode(companyCode)
+				.map(company -> Rendering.view("public/about")
+						.modelAttribute("company", company)
+						.modelAttribute("code", company.getCode())
+						.build())
+				.contextWrite(ctx -> TenantContextHolder.setCurrentTenant(ctx, companyCode));
+	}
 
 }

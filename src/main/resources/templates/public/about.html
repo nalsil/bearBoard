@@ -7,8 +7,330 @@
     <title th:text="${company != null ? company.name + ' - 회사 소개' : '회사 소개'}">회사 소개</title>
     <link rel="stylesheet" th:href="@{/css/common.css}">
     <link rel="stylesheet" th:href="@{/css/public.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script th:if="${company != null and company.latitude != null and company.longitude != null}"
             type="text/javascript" th:src="@{'//dapi.kakao.com/v2/maps/sdk.js?appkey=' + ${@environment.getProperty('app.kakao.map.app-key')}}"></script>
+    <style>
+        .about-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 100px 0;
+            text-align: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            animation: rotate 30s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .about-hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .about-hero h1 {
+            font-size: clamp(36px, 6vw, 56px);
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .about-hero p {
+            font-size: 18px;
+            opacity: 0.95;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        .about-section {
+            padding: 80px 0;
+        }
+
+        .company-overview {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .company-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .company-name {
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: 800;
+            color: #1F2937;
+            margin-bottom: 24px;
+        }
+
+        .company-description {
+            font-size: 18px;
+            color: #4B5563;
+            line-height: 1.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+            margin-top: 60px;
+        }
+
+        .info-card {
+            background: #fff;
+            padding: 32px;
+            border-radius: 20px;
+            border: 2px solid #E5E7EB;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-8px);
+            border-color: transparent;
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.15);
+        }
+
+        .info-card:hover::before {
+            opacity: 1;
+        }
+
+        .info-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+            color: #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover .info-icon {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+        .info-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #9CA3AF;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            font-size: 18px;
+            color: #1F2937;
+            font-weight: 600;
+            line-height: 1.6;
+        }
+
+        .info-value a {
+            color: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .info-value a:hover {
+            color: #667eea;
+        }
+
+        .map-section {
+            background: linear-gradient(180deg, #F9FAFB 0%, #fff 100%);
+            padding: 80px 0;
+        }
+
+        .map-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .map-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .map-header h2 {
+            font-size: clamp(28px, 5vw, 42px);
+            font-weight: 800;
+            color: #1F2937;
+            margin-bottom: 16px;
+        }
+
+        .map-header p {
+            font-size: 18px;
+            color: #6B7280;
+        }
+
+        .map-wrapper {
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border: 2px solid #E5E7EB;
+        }
+
+        #kakao-map {
+            width: 100%;
+            height: 500px;
+        }
+
+        .map-address {
+            padding: 24px 32px;
+            border-top: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1F2937;
+        }
+
+        .map-address i {
+            font-size: 24px;
+            color: #667eea;
+        }
+
+        .contact-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .contact-btn {
+            padding: 16px 36px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .contact-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .contact-btn.primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .contact-btn.secondary {
+            background: #F3F4F6;
+            color: #1F2937;
+            border: 2px solid #E5E7EB;
+        }
+
+        .contact-btn.secondary:hover {
+            background: #E5E7EB;
+            transform: translateY(-3px);
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 100px 20px;
+            background: linear-gradient(180deg, #F9FAFB 0%, #fff 100%);
+            border-radius: 20px;
+        }
+
+        .error-message i {
+            font-size: 80px;
+            color: #D1D5DB;
+            margin-bottom: 24px;
+        }
+
+        .error-message h3 {
+            font-size: 24px;
+            color: #1F2937;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .about-hero {
+                padding: 60px 0;
+            }
+
+            .about-section {
+                padding: 60px 0;
+            }
+
+            .company-name {
+                font-size: 28px;
+            }
+
+            .company-description {
+                font-size: 16px;
+            }
+
+            .info-grid {
+                gap: 20px;
+            }
+
+            .info-card {
+                padding: 24px;
+            }
+
+            #kakao-map {
+                height: 350px;
+            }
+
+            .map-address {
+                padding: 20px;
+                font-size: 16px;
+            }
+
+            .contact-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .contact-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- 헤더 -->
@@ -16,49 +338,126 @@
 
     <!-- 메인 컨텐츠 -->
     <main class="main-content">
-        <div class="container">
-            <article class="about-page" th:if="${company != null}">
-                <header class="page-header">
-                    <h1>회사 소개</h1>
-                </header>
+        <!-- 히어로 섹션 -->
+        <div class="about-hero" th:if="${company != null}">
+            <div class="container">
+                <div class="about-hero-content">
+                    <h1 th:text="${company.name}">회사명</h1>
+                    <p th:text="${company.description}">회사 설명</p>
+                </div>
+            </div>
+        </div>
 
-                <!-- 기업 정보 -->
-                <section class="company-overview">
-                    <h2 th:text="${company.name}">회사명</h2>
+        <!-- 기업 정보 섹션 -->
+        <section class="about-section" th:if="${company != null}">
+            <div class="company-overview">
+                <!-- 헤더 -->
+                <div class="company-header">
+                    <h2 class="company-name" th:text="${company.name}">회사명</h2>
                     <p class="company-description" th:text="${company.description}">회사 설명</p>
+                </div>
 
-                    <div class="company-details">
-                        <div class="detail-item" th:if="${company.foundedDate}">
-                            <strong>설립일</strong>
-                            <span th:text="${#temporals.format(company.foundedDate, 'yyyy년 MM월 dd일')}">설립일</span>
+                <!-- 정보 카드 그리드 -->
+                <div class="info-grid">
+                    <!-- 설립일 -->
+                    <div class="info-card" th:if="${company.foundedDate}">
+                        <div class="info-icon">
+                            <i class="fas fa-calendar-alt"></i>
                         </div>
-                        <div class="detail-item" th:if="${company.address}">
-                            <strong>주소</strong>
-                            <span th:text="${company.address}">주소</span>
+                        <div class="info-label">설립일</div>
+                        <div class="info-value" th:text="${#temporals.format(company.foundedDate, 'yyyy년 MM월 dd일')}">설립일</div>
+                    </div>
+
+                    <!-- 주소 -->
+                    <div class="info-card" th:if="${company.address}">
+                        <div class="info-icon">
+                            <i class="fas fa-map-marker-alt"></i>
                         </div>
-                        <div class="detail-item" th:if="${company.phone}">
-                            <strong>전화</strong>
-                            <span th:text="${company.phone}">전화번호</span>
+                        <div class="info-label">주소</div>
+                        <div class="info-value" th:text="${company.address}">주소</div>
+                    </div>
+
+                    <!-- 전화 -->
+                    <div class="info-card" th:if="${company.phone}">
+                        <div class="info-icon">
+                            <i class="fas fa-phone-alt"></i>
                         </div>
-                        <div class="detail-item" th:if="${company.email}">
-                            <strong>이메일</strong>
-                            <span><a th:href="'mailto:' + ${company.email}" th:text="${company.email}">이메일</a></span>
+                        <div class="info-label">전화</div>
+                        <div class="info-value">
+                            <a th:href="'tel:' + ${company.phone}" th:text="${company.phone}">전화번호</a>
                         </div>
                     </div>
-                </section>
 
-                <!-- 지도 섹션 -->
-                <section class="map-section" th:if="${company.latitude != null and company.longitude != null}">
-                    <h2>찾아오시는 길</h2>
-                    <div id="kakao-map" style="width:100%;height:400px;"></div>
-                    <p class="map-address" th:text="${company.address}">주소</p>
-                </section>
-            </article>
+                    <!-- 이메일 -->
+                    <div class="info-card" th:if="${company.email}">
+                        <div class="info-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="info-label">이메일</div>
+                        <div class="info-value">
+                            <a th:href="'mailto:' + ${company.email}" th:text="${company.email}">이메일</a>
+                        </div>
+                    </div>
 
-            <!-- 기업 정보 없음 -->
-            <div class="error-message" th:unless="${company != null}">
-                <p>회사 정보를 찾을 수 없습니다.</p>
+                    <!-- 비즈니스 타입 (추가 정보) -->
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="info-label">기업 유형</div>
+                        <div class="info-value">중소기업</div>
+                    </div>
+
+                    <!-- 근무 시간 -->
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="info-label">영업 시간</div>
+                        <div class="info-value">평일 09:00 - 18:00</div>
+                    </div>
+                </div>
             </div>
+        </section>
+
+        <!-- 지도 섹션 -->
+        <section class="map-section" th:if="${company != null and company.latitude != null and company.longitude != null}">
+            <div class="map-container">
+                <div class="map-header">
+                    <h2>찾아오시는 길</h2>
+                    <p>오시는 길을 쉽게 확인할 수 있습니다</p>
+                </div>
+
+                <div class="map-wrapper">
+                    <div id="kakao-map"></div>
+                    <div class="map-address">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span th:text="${company.address}">주소</span>
+                    </div>
+                </div>
+
+                <div class="contact-actions">
+                    <a th:href="'tel:' + ${company.phone}" th:if="${company.phone}" class="contact-btn primary">
+                        <i class="fas fa-phone-alt"></i> 전화하기
+                    </a>
+                    <a th:href="'mailto:' + ${company.email}" th:if="${company.email}" class="contact-btn secondary">
+                        <i class="fas fa-envelope"></i> 이메일
+                    </a>
+                    <a th:href="@{/{code}/qna(code=${company.code})}" class="contact-btn secondary">
+                        <i class="fas fa-paper-plane"></i> 문의하기
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 기업 정보 없음 -->
+        <div class="error-message" th:unless="${company != null}">
+            <i class="fas fa-exclamation-circle"></i>
+            <h3>회사 정보를 찾을 수 없습니다</h3>
+            <p>요청하신 회사 정보를 찾을 수 없습니다.<br>다시 시도하거나 관리자에게 문의해주세요.</p>
+            <a th:href="@{/}" class="contact-btn primary">
+                <i class="fas fa-home"></i> 홈으로 이동
+            </a>
         </div>
     </main>
 
@@ -74,6 +473,7 @@
             var latitude = /*[[${company.latitude}]]*/ 37.5;
             var longitude = /*[[${company.longitude}]]*/ 127.0;
             var companyName = /*[[${company.name}]]*/ '회사명';
+            var address = /*[[${company.address}]]*/ '주소';
 
             var mapContainer = document.getElementById('kakao-map');
             var mapOption = {
@@ -83,6 +483,7 @@
 
             var map = new kakao.maps.Map(mapContainer, mapOption);
 
+            // 마커 생성
             var markerPosition = new kakao.maps.LatLng(latitude, longitude);
             var marker = new kakao.maps.Marker({
                 position: markerPosition,
@@ -90,6 +491,21 @@
             });
 
             marker.setMap(map);
+
+            // 인포윈도우 생성
+            var infowindow = new kakao.maps.InfoWindow({
+                content: '<div style="padding:10px;font-weight:bold;font-size:16px;">' + companyName + '<br><small>' + address + '</small></div>',
+                position: markerPosition
+            });
+
+            kakao.maps.event.addListener(marker, 'click', function() {
+                infowindow.open(map, marker);
+            });
+
+            // 인포윈도우 자동 열기
+            setTimeout(function() {
+                infowindow.open(map, marker);
+            }, 500);
         });
         /*]]>*/
     </script>
