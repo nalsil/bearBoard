@@ -42,7 +42,10 @@ app:
     upload:
       base-dir: ${user.home}/bear-uploads
   recaptcha:
+    site-key: ${RECAPTCHA_SITE_KEY:test-site-key}
     secret-key: ${RECAPTCHA_SECRET_KEY:test-secret-key}
+    verify-url: https://www.google.com/recaptcha/api/siteverify
+    threshold: 0.5
   kakao:
     map:
       app-key: ${KAKAO_MAP_APP_KEY:test-app-key}

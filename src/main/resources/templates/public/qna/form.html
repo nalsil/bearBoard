@@ -7,7 +7,7 @@
     <title th:text="${company != null ? company.name + ' - 질문하기' : '질문하기'}">질문하기</title>
     <link rel="stylesheet" th:href="@{/css/common.css}">
     <link rel="stylesheet" th:href="@{/css/public.css}">
-    <script src="https://www.google.com/recaptcha/api.js?render=YOUR_RECAPTCHA_SITE_KEY"></script>
+    <script th:src="'https://www.google.com/recaptcha/api.js?render=' + ${recaptchaSiteKey}"></script>
     <style>
         .form-section {
             max-width: 700px;
@@ -91,7 +91,8 @@
             <!-- 에러 메시지 -->
             <div class="error-message" th:if="${param.error != null and !#lists.isEmpty(param.error)}">
                 <p th:if="${param.error[0] == 'invalid-email'}">올바른 이메일 주소를 입력해주세요.</p>
-<p th:unless="${param.error[0] == 'invalid-email'}">질문 등록 중 오류가 발생했습니다.</p>
+                <p th:if="${param.error[0] == 'recaptcha-failed'}">보안 검증에 실패했습니다. 다시 시도해주세요.</p>
+                <p th:unless="${param.error[0] == 'invalid-email' or param.error[0] == 'recaptcha-failed'}">질문 등록 중 오류가 발생했습니다.</p>
             </div>
 
             <form th:action="@{/{code}/qna(code=${company.code})}" method="post" id="qna-form">
@@ -135,20 +136,30 @@
     <div th:replace="~{layout/layout :: footer}"></div>
 
     <script th:src="@{/js/common.js}"></script>
-    <script>
+    <script th:inline="javascript">
+        // reCAPTCHA 사이트 키
+        const recaptchaSiteKey = /*[[${recaptchaSiteKey}]]*/ 'test-site-key';
+
         // reCAPTCHA v3 토큰 생성 (폼 제출 시)
         document.getElementById('qna-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            // TODO: 실제 reCAPTCHA 사이트 키로 교체
-            // grecaptcha.ready(function() {
-            //     grecaptcha.execute('YOUR_RECAPTCHA_SITE_KEY', {action: 'submit'}).then(function(token) {
-            //         document.getElementById('recaptchaToken').value = token;
-            //         document.getElementById('qna-form').submit();
-            //     });
-            // });
 
-            // 임시: reCAPTCHA 없이 제출
-            document.getElementById('qna-form').submit();
+            // 테스트 환경에서는 바로 제출
+            if (recaptchaSiteKey === 'test-site-key') {
+                document.getElementById('qna-form').submit();
+                return;
+            }
+
+            // reCAPTCHA 토큰 생성 후 제출
+            grecaptcha.ready(function() {
+                grecaptcha.execute(recaptchaSiteKey, {action: 'submit_qna'}).then(function(token) {
+                    document.getElementById('recaptchaToken').value = token;
+                    document.getElementById('qna-form').submit();
+                }).catch(function(error) {
+                    console.error('reCAPTCHA 오류:', error);
+                    alert('보안 검증 중 오류가 발생했습니다. 페이지를 새로고침 후 다시 시도해주세요.');
+                });
+            });
         });
     </script>
 </body>

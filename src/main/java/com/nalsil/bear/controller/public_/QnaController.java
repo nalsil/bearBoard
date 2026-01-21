@@ -1,10 +1,12 @@
 package com.nalsil.bear.controller.public_;
 
+import com.nalsil.bear.config.RecaptchaConfig;
 import com.nalsil.bear.domain.qna.Qna;
 import com.nalsil.bear.dto.request.CreateQnaRequest;
 import com.nalsil.bear.mapper.QnaMapper;
 import com.nalsil.bear.service.CompanyService;
 import com.nalsil.bear.service.QnaService;
+import com.nalsil.bear.service.RecaptchaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -33,6 +35,8 @@ public class QnaController {
     private final CompanyService companyService;
     private final QnaService qnaService;
     private final QnaMapper qnaMapper;
+    private final RecaptchaService recaptchaService;
+    private final RecaptchaConfig recaptchaConfig;
 
     /**
      * QnA 목록 페이지
@@ -143,7 +147,10 @@ public class QnaController {
         log.info("QnA 질문 등록 폼 요청: companyCode={}", companyCode);
 
         return companyService.getActiveCompanyByCode(companyCode)
-                .doOnNext(company -> model.addAttribute("company", company))
+                .doOnNext(company -> {
+                    model.addAttribute("company", company);
+                    model.addAttribute("recaptchaSiteKey", recaptchaConfig.getSiteKey());
+                })
                 .thenReturn("public/qna/form");
     }
 
@@ -178,17 +185,24 @@ public class QnaController {
             return Mono.just("redirect:/" + companyCode + "/qna/new?error=invalid-email");
         }
 
-        // TODO: reCAPTCHA 검증 추가
+        // reCAPTCHA 검증
+        return recaptchaService.verifyToken(request.getRecaptchaToken())
+                .flatMap(isValid -> {
+                    if (!isValid) {
+                        log.warn("reCAPTCHA 검증 실패: companyCode={}", companyCode);
+                        return Mono.just("redirect:/" + companyCode + "/qna/new?error=recaptcha-failed");
+                    }
 
-        return companyService.getActiveCompanyByCode(companyCode)
-                .flatMap(company -> {
-                    // QnA 엔티티 생성 (MapStruct 사용)
-                    Qna qna = qnaMapper.toEntity(request);
-                    qna.setCompanyId(company.getId());
+                    return companyService.getActiveCompanyByCode(companyCode)
+                            .flatMap(company -> {
+                                // QnA 엔티티 생성 (MapStruct 사용)
+                                Qna qna = qnaMapper.toEntity(request);
+                                qna.setCompanyId(company.getId());
 
-                    // QnA 저장
-                    return qnaService.createQna(qna);
-                })
-                .then(Mono.just("redirect:/" + companyCode + "/qna?success=true"));
+                                // QnA 저장
+                                return qnaService.createQna(qna);
+                            })
+                            .then(Mono.just("redirect:/" + companyCode + "/qna?success=true"));
+                });
     }
 }
