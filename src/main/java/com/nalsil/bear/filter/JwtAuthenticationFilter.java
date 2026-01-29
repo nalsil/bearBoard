@@ -43,8 +43,15 @@ public class JwtAuthenticationFilter implements WebFilter {
             path.startsWith("/images/") || path.equals("/favicon.ico") ||
             path.equals("/admin/login") || // 로그인 페이지는 필터 건너뛰기
             path.equals("/admin/logout") || // 로그아웃 페이지는 필터 건너뛰기
-            !path.startsWith("/admin/")) {
+            path.equals("/api/auth/login") || // API 로그인은 필터 건너뛰기
+            path.equals("/api/auth/logout")) { // API 로그아웃은 필터 건너뛰기
             log.info("JwtAuthenticationFilter: 필터 건너뛰기 - Path: {}", path);
+            return chain.filter(exchange);
+        }
+
+        // /admin/ 또는 /api/auth/ 또는 /api/admin/ 경로만 JWT 검증
+        if (!path.startsWith("/admin/") && !path.startsWith("/api/auth/") && !path.startsWith("/api/admin/")) {
+            log.info("JwtAuthenticationFilter: JWT 검증 대상 아님 - Path: {}", path);
             return chain.filter(exchange);
         }
 

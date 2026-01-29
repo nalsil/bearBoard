@@ -55,6 +55,10 @@ public class WebFluxConfig implements WebFluxConfigurer {
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // React Admin App 정적 리소스 (assets)
+        registry.addResourceHandler("/admin-app/assets/**")
+                .addResourceLocations("classpath:/static/admin-app/assets/");
+
         registry.addResourceHandler("/css/**")
                 .addResourceLocations("classpath:/static/css/");
 
