@@ -42,7 +42,9 @@
       "Bash(chmod:*)",
       "Bash(tree:*)",
       "Bash(psql:*)",
-      "Bash(where:*)"
+      "Bash(where:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)"
     ]
   }
 }

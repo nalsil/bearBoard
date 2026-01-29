@@ -142,4 +142,26 @@ public class QnaService {
         log.info("Deleting QnA: id={}", qnaId);
         return qnaRepository.deleteById(qnaId);
     }
+
+    /**
+     * 기업별 모든 QnA 목록 조회 (관리자용, 페이징 없음)
+     *
+     * @param companyId 기업 ID
+     * @return QnA 목록
+     */
+    public Flux<Qna> getAllQnasByCompanyId(Long companyId) {
+        log.debug("기업 ID로 모든 QnA 목록 조회 (페이징 없음): companyId={}", companyId);
+        return qnaRepository.findByCompanyIdOrderByCreatedAtDesc(companyId, Pageable.unpaged());
+    }
+
+    /**
+     * 기업별 미답변 QnA 목록 조회
+     *
+     * @param companyId 기업 ID
+     * @return 미답변 QnA 목록
+     */
+    public Flux<Qna> getUnansweredQnasByCompanyId(Long companyId) {
+        log.debug("기업 ID로 미답변 QnA 목록 조회: companyId={}", companyId);
+        return qnaRepository.findByCompanyIdAndIsAnsweredOrderByCreatedAtDesc(companyId, false, Pageable.unpaged());
+    }
 }

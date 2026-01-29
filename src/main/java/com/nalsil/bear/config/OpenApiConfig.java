@@ -81,12 +81,24 @@ public class OpenApiConfig {
     }
 
     /**
-     * 관리자 API
+     * REST API (React 관리자 앱용)
+     */
+    @Bean
+    public GroupedOpenApi restApi() {
+        return GroupedOpenApi.builder()
+                .group("01. REST API")
+                .pathsToMatch("/api/**")
+                .packagesToScan("com.nalsil.bear.controller.api")
+                .build();
+    }
+
+    /**
+     * 관리자 API (Thymeleaf)
      */
     @Bean
     public GroupedOpenApi adminApi() {
         return GroupedOpenApi.builder()
-                .group("01. 관리자 API")
+                .group("02. 관리자 API (Thymeleaf)")
                 .pathsToMatch("/admin/**")
                 .packagesToScan("com.nalsil.bear.controller.admin")
                 .build();
@@ -98,7 +110,7 @@ public class OpenApiConfig {
     @Bean
     public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
-                .group("02. 공개 페이지 API")
+                .group("03. 공개 페이지 API")
                 .pathsToMatch("/{companyCode}/**", "/", "/favicon.ico")
                 .packagesToScan("com.nalsil.bear.controller.public_", "com.nalsil.bear.controller")
                 .packagesToExclude("com.nalsil.bear.controller.admin")

@@ -56,6 +56,12 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         // Swagger UI 및 API docs는 인증 없이 접근 가능
                         .pathMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/webjars/**").permitAll()
+                        // API 인증 엔드포인트는 인증 없이 접근 가능
+                        .pathMatchers("/api/auth/login").permitAll()
+                        .pathMatchers("/api/auth/logout").permitAll()
+                        // API 관리자 엔드포인트는 인증 필요
+                        .pathMatchers("/api/auth/**").authenticated()
+                        .pathMatchers("/api/admin/**").authenticated()
                         // 로그인 페이지는 인증 없이 접근 가능
                         .pathMatchers(HttpMethod.GET, "/admin/login").permitAll()
                         .pathMatchers(HttpMethod.POST, "/admin/login").permitAll()
@@ -66,6 +72,8 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.POST, "/admin/switch-company").authenticated()
                         // 정적 리소스는 인증 없이 접근 가능
                         .pathMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+                        // React 관리자 앱 정적 파일
+                        .pathMatchers("/admin-app/**").permitAll()
                         .pathMatchers("/actuator/health").permitAll()
                         // 기타 모든 admin 경로는 인증 필요
                         .pathMatchers("/admin/**").authenticated()
