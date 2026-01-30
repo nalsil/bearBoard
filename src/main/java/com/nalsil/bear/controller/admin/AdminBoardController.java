@@ -102,19 +102,26 @@ public class AdminBoardController {
                 .flatMap(company -> {
                     model.addAttribute("company", company);
 
-                    return boardService.getBoardById(boardId)
-                            .flatMap(board -> {
-                                // 권한 확인
-                                if (!board.getCompanyId().equals(adminCompanyId)) {
-                                    return Mono.error(new IllegalAccessException("접근 권한이 없습니다."));
-                                }
+                    // 회사의 모든 게시판 목록 조회 (다중 게시판 탭용)
+                    return boardService.getBoardsByCompanyId(adminCompanyId)
+                            .collectList()
+                            .flatMap(boards -> {
+                                model.addAttribute("boards", boards);
 
-                                model.addAttribute("board", board);
+                                return boardService.getBoardById(boardId)
+                                        .flatMap(board -> {
+                                            // 권한 확인
+                                            if (!board.getCompanyId().equals(adminCompanyId)) {
+                                                return Mono.error(new IllegalAccessException("접근 권한이 없습니다."));
+                                            }
 
-                                // 숨김 포함 전체 게시글 조회 (관리자용)
-                                return postService.getPostsByBoardIdIncludingHidden(boardId, 0, 100)
-                                        .collectList()
-                                        .doOnNext(posts -> model.addAttribute("posts", posts));
+                                            model.addAttribute("board", board);
+
+                                            // 숨김 포함 전체 게시글 조회 (관리자용)
+                                            return postService.getPostsByBoardIdIncludingHidden(boardId, 0, 100)
+                                                    .collectList()
+                                                    .doOnNext(posts -> model.addAttribute("posts", posts));
+                                        });
                             });
                 })
                 .thenReturn("admin/board/list")

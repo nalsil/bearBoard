@@ -31,12 +31,6 @@ public class JwtAuthenticationFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
         String path = request.getURI().getPath();
-        String method = request.getMethod().name();
-
-        log.info("========== JwtAuthenticationFilter 실행 ==========");
-        log.info("Method: {}, Path: {}", method, path);
-        log.info("Cookies: {}", request.getCookies().keySet());
-        log.info("All Cookies: {}", request.getCookies());
 
         // 정적 리소스와 공개 경로는 필터 건너뛰기
         if (path.startsWith("/css/") || path.startsWith("/js/") ||
@@ -45,21 +39,18 @@ public class JwtAuthenticationFilter implements WebFilter {
             path.equals("/admin/logout") || // 로그아웃 페이지는 필터 건너뛰기
             path.equals("/api/auth/login") || // API 로그인은 필터 건너뛰기
             path.equals("/api/auth/logout")) { // API 로그아웃은 필터 건너뛰기
-            log.info("JwtAuthenticationFilter: 필터 건너뛰기 - Path: {}", path);
             return chain.filter(exchange);
         }
 
         // /admin/ 또는 /api/auth/ 또는 /api/admin/ 경로만 JWT 검증
         if (!path.startsWith("/admin/") && !path.startsWith("/api/auth/") && !path.startsWith("/api/admin/")) {
-            log.info("JwtAuthenticationFilter: JWT 검증 대상 아님 - Path: {}", path);
             return chain.filter(exchange);
         }
 
-        log.info("JwtAuthenticationFilter: JWT 검증 시작 - Path: {}", path);
+        log.debug("JWT 검증: {}", path);
 
         // Authorization 헤더 또는 Cookie에서 JWT 토큰 추출
         String token = extractToken(request);
-        log.info("JwtAuthenticationFilter: 토큰 추출 결과 - token={}", token != null ? "존재" : "null");
 
         if (token != null && jwtUtil.validateToken(token)) {
             try {
@@ -68,9 +59,7 @@ public class JwtAuthenticationFilter implements WebFilter {
                 Long adminId = jwtUtil.getAdminIdFromToken(token);
                 Long companyId = jwtUtil.getCompanyIdFromToken(token);
 
-                log.info("========== JWT 인증 성공 ==========");
-                log.info("Path: {}, Username: {}, Role: {}, AdminId: {}, CompanyId: {}",
-                    path, username, role, adminId, companyId);
+                log.debug("JWT 인증 성공: user={}, role={}", username, role);
 
                 // Spring Security Authentication 생성
                 // Spring Security는 hasRole("ADMIN")을 "ROLE_ADMIN"으로 변환하므로 접두사 추가 필요
@@ -99,11 +88,7 @@ public class JwtAuthenticationFilter implements WebFilter {
                 log.error("JWT 인증 처리 중 오류 발생", e);
             }
         } else {
-            if (token == null) {
-                log.warn("JWT 토큰을 찾을 수 없음 - Path: {}", path);
-            } else {
-                log.warn("JWT 토큰 검증 실패 - Path: {}", path);
-            }
+            log.debug("JWT 인증 실패: path={}, token={}", path, token != null ? "invalid" : "missing");
         }
 
         return chain.filter(exchange);
@@ -118,22 +103,16 @@ public class JwtAuthenticationFilter implements WebFilter {
     private String extractToken(ServerHttpRequest request) {
         // 1. Authorization 헤더에서 Bearer 토큰 추출
         String bearerToken = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-        log.info("Authorization 헤더: {}", bearerToken);
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            log.info("Bearer 토큰 발견");
             return bearerToken.substring(7);
         }
 
         // 2. Cookie에서 JWT 토큰 추출
-        log.info("쿠키 검색 시작 - 전체 쿠키: {}", request.getCookies());
         if (request.getCookies().containsKey("JWT-TOKEN")) {
             var cookie = request.getCookies().getFirst("JWT-TOKEN");
             if (cookie != null) {
-                log.info("JWT-TOKEN 쿠키 발견: {}", cookie.getValue().substring(0, Math.min(20, cookie.getValue().length())) + "...");
                 return cookie.getValue();
             }
-        } else {
-            log.warn("JWT-TOKEN 쿠키를 찾을 수 없음");
         }
 
         return null;

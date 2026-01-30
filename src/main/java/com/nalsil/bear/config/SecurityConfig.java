@@ -33,8 +33,6 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) {
-        log.info("========== JWT SecurityWebFilterChain 빈 생성 ==========");
-
         return http
                 .cors(ServerHttpSecurity.CorsSpec::disable)  // CORS 비활성화 (WebFluxConfig에서 처리)
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
@@ -47,8 +45,7 @@ public class SecurityConfig {
                 // 인증 실패 시 처리
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint((exchange, ex) -> {
-                            log.warn("인증 실패: path={}, error={}",
-                                    exchange.getRequest().getPath(), ex.getMessage());
+                            log.debug("인증 필요: path={}", exchange.getRequest().getPath());
                             exchange.getResponse().setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
                             return exchange.getResponse().setComplete();
                         })

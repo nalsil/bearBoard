@@ -97,17 +97,7 @@ public class AdminLoginController {
     })
     @PostMapping("/login")
     public Mono<String> login(ServerWebExchange exchange) {
-        log.error("========== !!! 관리자 로그인 POST 요청 도달!!! ==========");
-        log.error("Request Method: {}", exchange.getRequest().getMethod());
-        log.error("Request URI: {}", exchange.getRequest().getURI());
-        log.error("Content-Type: {}", exchange.getRequest().getHeaders().getContentType());
-
         return exchange.getFormData()
-                .doOnNext(formData -> {
-                    log.info("Form Data: {}", formData);
-                    log.info("Username: {}", formData.getFirst("username"));
-                    log.info("Password: {}", formData.getFirst("password"));
-                })
                 .flatMap(formData -> {
                     String username = formData.getFirst("username");
                     String password = formData.getFirst("password");

@@ -3,14 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>게시글 관리</title>
+    <title>게시판 관리</title>
     <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <style>
+        /* 게시판 탭 스타일 */
+        .board-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #e2e8f0;
+            overflow-x: auto;
+        }
+
+        .board-tab {
+            padding: 0.875rem 1.5rem;
+            text-decoration: none;
+            color: #64748b;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .board-tab:hover {
+            color: #667eea;
+            background-color: #f8fafc;
+        }
+
+        .board-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            font-weight: 600;
+        }
+
+        .board-tab .post-count {
+            background: #e2e8f0;
+            color: #64748b;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .board-tab.active .post-count {
+            background: #667eea;
+            color: white;
+        }
+
+        /* 페이지 헤더 개선 */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #1e293b;
+        }
+
+        /* 테이블 개선 */
+        .data-table {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .data-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background: #f8fafc;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+        }
+
+        .data-table tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* 액션 버튼 그룹 */
+        .action-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: nowrap;
+        }
+
+        .action-group .btn {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.8rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .action-group .btn-edit {
+            background: #667eea;
+            color: white;
+        }
+
+        .action-group .btn-edit:hover {
+            background: #5a67d8;
+        }
+
+        .action-group .btn-toggle {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .action-group .btn-toggle:hover {
+            background: #d97706;
+        }
+
+        .action-group .btn-toggle.show {
+            background: #10b981;
+        }
+
+        .action-group .btn-toggle.show:hover {
+            background: #059669;
+        }
+
+        .action-group .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .action-group .btn-delete:hover {
+            background: #dc2626;
+        }
+
+        /* 빈 상태 */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #94a3b8;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state-text {
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+    </style>
 </head>
 <body>
     <!-- 헤더 -->
     <header class="admin-header">
         <div class="admin-header-content">
-            <h1>게시글 관리</h1>
+            <h1>게시판 관리</h1>
             <div class="admin-user-info">
                 <span th:text="${company != null ? company.name : '회사명'}">회사명</span>
                 <a th:href="@{/admin/logout}" class="btn-logout">로그아웃</a>
@@ -32,9 +204,23 @@
 
     <!-- 메인 컨텐츠 -->
     <main class="admin-main">
+        <!-- 게시판 탭 -->
+        <div class="board-tabs" th:if="${boards != null and !boards.isEmpty()}">
+            <a th:each="b : ${boards}"
+               th:href="@{/admin/boards/{boardId}/posts(boardId=${b.id})}"
+               th:classappend="${b.id == board.id} ? 'active' : ''"
+               class="board-tab">
+                <span th:text="${b.name}">게시판명</span>
+            </a>
+        </div>
+
         <div class="page-header">
-            <h1 th:text="${board != null ? board.name : '게시글 목록'}">게시글 목록</h1>
-            <a th:href="@{/admin/boards/{boardId}/posts/new(boardId=${board.id})}" class="btn-primary">게시글 작성</a>
+            <div>
+                <h1 th:text="${board != null ? board.name : '게시글 목록'}">게시글 목록</h1>
+            </div>
+            <a th:href="@{/admin/boards/{boardId}/posts/new(boardId=${board.id})}" class="btn-primary">
+                + 게시글 작성
+            </a>
         </div>
 
         <!-- 성공 메시지 -->
@@ -53,21 +239,27 @@
                         <th style="width: 100px;">작성자</th>
                         <th style="width: 80px;">조회수</th>
                         <th style="width: 80px;">상태</th>
-                        <th style="width: 140px;">작성일</th>
-                        <th style="width: 200px;">관리</th>
+                        <th style="width: 120px;">작성일</th>
+                        <th style="width: 180px;">관리</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:if="${posts == null or posts.isEmpty()}">
-                        <td colspan="7" style="text-align: center; padding: 3rem; color: #7f8c8d;">
-                            등록된 게시글이 없습니다.
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📝</div>
+                                <p class="empty-state-text">등록된 게시글이 없습니다.</p>
+                                <a th:href="@{/admin/boards/{boardId}/posts/new(boardId=${board.id})}"
+                                   class="btn-primary">첫 게시글 작성하기</a>
+                            </div>
                         </td>
                     </tr>
                     <tr th:each="post : ${posts}">
                         <td th:text="${post.id}">1</td>
                         <td>
                             <strong th:text="${post.title}">게시글 제목</strong>
-                            <span class="badge badge-danger" th:if="${post.isHidden}">숨김</span>
+                            <span class="badge badge-danger" th:if="${post.isHidden}"
+                                  style="margin-left: 0.5rem; font-size: 0.7rem;">숨김</span>
                         </td>
                         <td th:text="${post.author}">관리자</td>
                         <td th:text="${post.viewCount}">0</td>
@@ -77,18 +269,20 @@
                         </td>
                         <td th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd')}">2024-01-01</td>
                         <td>
-                            <div style="display: flex; gap: 0.5rem;">
+                            <div class="action-group">
                                 <a th:href="@{/admin/boards/{boardId}/posts/{postId}/edit(boardId=${board.id}, postId=${post.id})}"
-                                   class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">수정</a>
+                                   class="btn btn-edit">수정</a>
                                 <form th:action="@{/admin/boards/{boardId}/posts/{postId}/toggle-hidden(boardId=${board.id}, postId=${post.id})}"
                                       method="post" style="display: inline;">
-                                    <button type="submit" class="btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;"
+                                    <button type="submit"
+                                            class="btn btn-toggle"
+                                            th:classappend="${post.isHidden ? 'show' : ''}"
                                             th:text="${post.isHidden ? '공개' : '숨김'}">숨김</button>
                                 </form>
                                 <form th:action="@{/admin/boards/{boardId}/posts/{postId}/delete(boardId=${board.id}, postId=${post.id})}"
                                       method="post" style="display: inline;"
                                       onsubmit="return confirm('정말 삭제하시겠습니까?');">
-                                    <button type="submit" class="btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;">삭제</button>
+                                    <button type="submit" class="btn btn-delete">삭제</button>
                                 </form>
                             </div>
                         </td>
